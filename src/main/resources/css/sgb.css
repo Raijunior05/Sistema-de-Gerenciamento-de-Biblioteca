@@ -1,0 +1,368 @@
+/*
+ * BiblioTech - identidade visual
+ * Paleta extraida do prototipo Figma (SGB.svg).
+ */
+
+.root {
+    -fx-navy-900: #0B1B3D;
+    -fx-navy-800: #14254D;
+    -fx-navy-700: #2D3748;
+    -fx-navy-600: #4A5568;
+    -fx-gold:     #C5A059;
+    -fx-gold-100: #F2D299;
+    -fx-claro:    #F0F4F8;
+    -fx-cinza-200:#CBD5E0;
+    -fx-verde:    #2E7D32;
+    -fx-verde-100:#81C784;
+    -fx-vermelho: #C62828;
+    -fx-verm-100: #E57373;
+
+    -fx-background-color: -fx-navy-900;
+    -fx-font-family: "Segoe UI", "Inter", system-ui, sans-serif;
+    -fx-font-size: 14px;
+}
+
+/* ---------- Marca ---------- */
+
+.marca-sgb {
+    -fx-text-fill: -fx-gold;
+    -fx-font-size: 40px;
+    -fx-font-weight: bold;
+    -fx-letter-spacing: 6px;
+}
+
+.marca-legenda {
+    -fx-text-fill: -fx-gold;
+    -fx-font-size: 11px;
+    -fx-letter-spacing: 1.5px;
+}
+
+/* ---------- Estrutura ---------- */
+
+.painel {
+    -fx-background-color: -fx-navy-700;
+    -fx-background-radius: 4px;
+    -fx-padding: 32px;
+}
+
+.cabecalho {
+    -fx-background-color: -fx-navy-900;
+    -fx-padding: 16px 32px;
+}
+
+.saudacao {
+    -fx-text-fill: -fx-claro;
+    -fx-font-size: 20px;
+    -fx-letter-spacing: 2px;
+}
+
+.titulo-tela {
+    -fx-text-fill: -fx-gold;
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-letter-spacing: 5px;
+}
+
+.rotulo-campo {
+    -fx-text-fill: -fx-gold;
+    -fx-font-size: 14px;
+    -fx-letter-spacing: 1.5px;
+}
+
+.rotulo-secao {
+    -fx-text-fill: -fx-gold;
+    -fx-font-size: 12px;
+    -fx-letter-spacing: 1px;
+}
+
+/* ---------- Campos ---------- */
+
+.text-field, .password-field, .date-picker > .text-field, .combo-box {
+    -fx-background-color: -fx-navy-600;
+    -fx-background-radius: 2px;
+    -fx-text-fill: -fx-claro;
+    -fx-prompt-text-fill: -fx-cinza-200;
+    -fx-border-color: transparent;
+    -fx-padding: 8px 12px;
+}
+
+.text-field:focused, .password-field:focused, .combo-box:focused {
+    -fx-border-color: -fx-gold;
+    -fx-border-width: 1px;
+}
+
+.combo-box .list-cell {
+    -fx-text-fill: -fx-claro;
+    -fx-background-color: -fx-navy-600;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: -fx-navy-700;
+}
+
+/* ---------- Botoes ---------- */
+
+.botao-primario {
+    -fx-background-color: -fx-claro;
+    -fx-text-fill: -fx-navy-900;
+    -fx-background-radius: 2px;
+    -fx-padding: 12px 28px;
+    -fx-letter-spacing: 2px;
+    -fx-cursor: hand;
+}
+
+.botao-primario:hover {
+    -fx-background-color: white;
+}
+
+.botao-secundario {
+    -fx-background-color: transparent;
+    -fx-text-fill: -fx-claro;
+    -fx-border-color: -fx-navy-600;
+    -fx-border-radius: 2px;
+    -fx-background-radius: 2px;
+    -fx-padding: 12px 28px;
+    -fx-letter-spacing: 2px;
+    -fx-cursor: hand;
+}
+
+.botao-secundario:hover {
+    -fx-border-color: -fx-gold;
+}
+
+.botao-menu {
+    -fx-background-color: -fx-navy-700;
+    -fx-text-fill: -fx-claro;
+    -fx-background-radius: 2px;
+    -fx-padding: 14px 20px;
+    -fx-letter-spacing: 1px;
+    -fx-cursor: hand;
+}
+
+.botao-menu:hover {
+    -fx-background-color: -fx-navy-600;
+}
+
+.botao-menu-ativo {
+    -fx-background-color: -fx-claro;
+    -fx-text-fill: -fx-navy-900;
+}
+
+.link-discreto {
+    -fx-text-fill: -fx-claro;
+    -fx-font-size: 11px;
+    -fx-underline: true;
+}
+
+/* ---------- Cartoes da visao geral ---------- */
+
+.cartao {
+    -fx-background-color: -fx-navy-700;
+    -fx-border-color: -fx-navy-600;
+    -fx-border-radius: 2px;
+    -fx-background-radius: 2px;
+    -fx-padding: 20px;
+}
+
+.cartao-rotulo {
+    -fx-text-fill: -fx-gold;
+    -fx-font-size: 13px;
+}
+
+.cartao-valor {
+    -fx-text-fill: -fx-gold;
+    -fx-font-size: 30px;
+    -fx-font-weight: bold;
+}
+
+.cartao-valor-alerta {
+    -fx-text-fill: -fx-verm-100;
+}
+
+.cartao-valor-ok {
+    -fx-text-fill: -fx-verde-100;
+}
+
+/* ---------- Tabelas ---------- */
+
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: -fx-navy-600;
+    -fx-border-radius: 2px;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: -fx-navy-600;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: -fx-gold;
+    -fx-font-size: 12px;
+    -fx-letter-spacing: 1px;
+    -fx-alignment: center-left;
+}
+
+.table-view .table-row-cell {
+    -fx-background-color: -fx-navy-700;
+    -fx-border-color: transparent transparent -fx-navy-600 transparent;
+}
+
+.table-view .table-row-cell:odd {
+    -fx-background-color: -fx-navy-800;
+}
+
+.table-view .table-row-cell:selected {
+    -fx-background-color: -fx-navy-600;
+}
+
+.table-view .table-cell {
+    -fx-text-fill: -fx-claro;
+    -fx-padding: 10px 12px;
+}
+
+.table-view .placeholder .label {
+    -fx-text-fill: -fx-cinza-200;
+}
+
+/* ---------- Badges de status ---------- */
+
+.badge {
+    -fx-background-radius: 2px;
+    -fx-padding: 3px 14px;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-letter-spacing: 1px;
+}
+
+.badge-ativo {
+    -fx-background-color: -fx-verde;
+    -fx-text-fill: white;
+}
+
+.badge-atrasado {
+    -fx-background-color: -fx-vermelho;
+    -fx-text-fill: white;
+}
+
+.badge-neutro {
+    -fx-background-color: -fx-navy-600;
+    -fx-text-fill: -fx-claro;
+}
+
+.badge-disponivel {
+    -fx-background-color: -fx-gold;
+    -fx-text-fill: -fx-navy-900;
+}
+
+.badge-pendente {
+    -fx-background-color: -fx-navy-600;
+    -fx-text-fill: -fx-claro;
+}
+
+/* ---------- Rodape de navegacao ---------- */
+
+.rodape {
+    -fx-background-color: -fx-navy-800;
+    -fx-padding: 12px 32px;
+}
+
+.rodape-usuario {
+    -fx-text-fill: -fx-claro;
+    -fx-font-size: 16px;
+    -fx-letter-spacing: 2px;
+}
+
+/* ---------- Mensagens ---------- */
+
+.mensagem-erro {
+    -fx-text-fill: -fx-verm-100;
+    -fx-font-size: 12px;
+}
+
+.mensagem-sucesso {
+    -fx-text-fill: -fx-verde-100;
+    -fx-font-size: 12px;
+}
+
+/* Login e inicial: medidas a meia escala dos frames 1920 x 1080 do Figma. */
+.tela-prototipo {
+    -fx-background-color: radial-gradient(center 50% 120%, radius 70%, #C5A059 0%, #0B1B3D 65%);
+}
+.tela-prototipo .painel {
+    -fx-background-color: rgba(217,217,217,0.2);
+    -fx-background-radius: 23px;
+    -fx-border-color: rgba(240,244,248,0.18);
+    -fx-border-radius: 23px;
+    -fx-border-width: 1px;
+}
+.login { -fx-padding: 18px 0px 18px 42px; }
+.login-painel { -fx-padding: 0px; }
+.login .text-field {
+    -fx-background-color: rgba(217,217,217,0.2);
+    -fx-background-radius: 23px;
+    -fx-border-radius: 23px;
+    -fx-border-color: rgba(240,244,248,0.2);
+    -fx-pref-height: 45px;
+}
+.login .rotulo-campo { -fx-font-size: 15px; }
+.login .link-discreto { -fx-font-size: 9px; -fx-padding: 0px 8px; }
+.login-marca { -fx-font-size: 64px; -fx-effect: dropshadow(gaussian, rgba(240,244,248,0.5), 5, 0, 0, 0); }
+.login .marca-legenda { -fx-font-size: 9px; }
+.tela-prototipo .botao-menu, .tela-prototipo .botao-primario {
+    -fx-background-radius: 17px;
+    -fx-font-size: 11px;
+    -fx-padding: 12px 14px;
+    -fx-font-weight: bold;
+}
+.tela-prototipo .botao-menu { -fx-background-color: -fx-navy-700; -fx-text-fill: -fx-gold; }
+.tela-prototipo .botao-menu:hover { -fx-background-color: -fx-navy-600; }
+.tela-prototipo .button:focused, .menu-operacoes:focused {
+    -fx-border-color: -fx-gold;
+    -fx-border-radius: 17px;
+}
+.inicial .cabecalho { -fx-background-color: transparent; -fx-padding: 6px 85px 18px 16px; }
+.inicial .marca-pequena { -fx-font-size: 22px; }
+.inicial .legenda-pequena { -fx-font-size: 5px; }
+.inicial .saudacao { -fx-text-fill: -fx-gold; -fx-font-size: 17px; -fx-font-weight: bold; }
+.inicial-painel { -fx-padding: 18px 19px 20px 19px; }
+.inicial .titulo-tela { -fx-font-size: 19px; }
+.inicial .cartao {
+    -fx-background-color: rgba(217,217,217,0.06);
+    -fx-background-radius: 12px;
+    -fx-border-color: rgba(197,160,89,0.2);
+    -fx-border-radius: 12px;
+    -fx-padding: 12px;
+    -fx-min-height: 110px;
+}
+.inicial .cartao-rotulo, .inicial .rotulo-secao { -fx-font-size: 11px; -fx-font-weight: bold; }
+.inicial .cartao-valor { -fx-font-size: 20px; }
+.inicial .rodape {
+    -fx-background-color: rgba(217,217,217,0.2);
+    -fx-background-radius: 23px 23px 0px 0px;
+    -fx-border-color: rgba(240,244,248,0.2);
+    -fx-border-radius: 23px 23px 0px 0px;
+    -fx-padding: 6px 18px;
+}
+.inicial .rodape-usuario { -fx-text-fill: -fx-gold; -fx-font-size: 12px; -fx-font-weight: bold; }
+.menu-operacoes, .botao-sair { -fx-background-color: transparent; -fx-cursor: hand; -fx-padding: 0px; }
+.menu-operacoes .arrow-button { -fx-padding: 0px; }
+.menu-operacoes .arrow { -fx-shape: ""; -fx-padding: 0px; }
+.perfil-circulo { -fx-border-color: -fx-gold; -fx-border-radius: 50%; -fx-border-width: 2px; -fx-padding: 8px; }
+.context-menu { -fx-background-color: -fx-navy-700; }
+.menu-item .label { -fx-text-fill: -fx-gold; }
+.menu-item:focused { -fx-background-color: -fx-navy-600; }
+.relatorios { -fx-padding: 28px; }
+.relatorios .tab-header-background, .relatorios .tab { -fx-background-color: -fx-navy-700; }
+.relatorios .tab:selected { -fx-background-color: -fx-navy-600; }
+.relatorios .tab-label { -fx-text-fill: -fx-gold; }
+.relatorios .tab-content-area { -fx-padding: 18px 0px; }
+.relatorios .check-box { -fx-text-fill: -fx-claro; }
+
+@font-face { src: url("../fonts/Montserrat-Regular.ttf"); }
+@font-face { src: url("../fonts/Montserrat-Bold.ttf"); }
+.tela-prototipo { -fx-font-family: "Montserrat"; }
+.login .text-field { -fx-min-height: 45px; }
+.login .button { -fx-min-height: 50px; }
+.relatorios .table-view .column-header, .relatorios .table-view .filler {
+    -fx-background-color: -fx-navy-600;
+}

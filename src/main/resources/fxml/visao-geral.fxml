@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.StackPane?>
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="br.univasf.bibliotech.view.VisaoGeralController" styleClass="tela-prototipo,inicial">
+    <top>
+        <HBox styleClass="cabecalho" alignment="CENTER_LEFT" spacing="16">
+            <VBox alignment="CENTER">
+                <Label text="S G B" styleClass="marca-sgb,marca-pequena"/>
+                <Label text="Sistema de Gerenciamento de Bibliotecas" styleClass="marca-legenda,legenda-pequena"/>
+            </VBox>
+            <ImageView fitWidth="40" fitHeight="26" preserveRatio="true"><image><Image url="@../images/livros.png"/></image></ImageView>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="saudacao" text="Olá, Administrador" styleClass="saudacao"/>
+        </HBox>
+    </top>
+    <center>
+        <VBox styleClass="painel,inicial-painel" spacing="0" maxWidth="1050">
+            <BorderPane.margin><Insets top="0" right="76" bottom="22" left="76"/></BorderPane.margin>
+            <Label text="V I S Ã O  G E R A L" styleClass="titulo-tela" maxWidth="Infinity" alignment="CENTER"/>
+            <Region prefHeight="42" VBox.vgrow="ALWAYS"/>
+            <HBox spacing="16">
+                <VBox styleClass="cartao" spacing="6" prefWidth="240" HBox.hgrow="ALWAYS">
+                    <Label text="Livros Atrasados:" styleClass="cartao-rotulo"/>
+                    <Label fx:id="valorAtrasados" text="—" styleClass="cartao-valor"/>
+                </VBox>
+                <VBox styleClass="cartao" spacing="6" prefWidth="240" HBox.hgrow="ALWAYS">
+                    <Label text="Livros Emprestados:" styleClass="cartao-rotulo"/>
+                    <Label fx:id="valorEmprestados" text="—" styleClass="cartao-valor"/>
+                </VBox>
+                <VBox styleClass="cartao" spacing="6" prefWidth="240" HBox.hgrow="ALWAYS">
+                    <Label text="Reservas Pendentes:" styleClass="cartao-rotulo"/>
+                    <Label fx:id="valorReservas" text="—" styleClass="cartao-valor"/>
+                </VBox>
+            </HBox>
+            <Region prefHeight="42" VBox.vgrow="ALWAYS"/>
+            <VBox styleClass="cartao,acesso-rapido" spacing="18">
+                <Label text="Acesso rápido:" styleClass="rotulo-secao"/>
+                <FlowPane hgap="12" vgap="12" prefWrapLength="744">
+                    <Button text="Gerar Relatório" styleClass="botao-menu" onAction="#onGerarRelatorio" prefWidth="190"/>
+                    <Button text="Pesquisar Acervo" styleClass="botao-menu" onAction="#onPesquisarAcervo" prefWidth="190"/>
+                    <Button text="Cadastrar item" styleClass="botao-menu" onAction="#onCadastrarItem" prefWidth="190"/>
+                    <Button text="Realizar reserva" styleClass="botao-menu" onAction="#onRealizarReserva" prefWidth="190"/>
+                    <Button text="Realizar devolução" styleClass="botao-menu" onAction="#onRealizarDevolucao" prefWidth="190"/>
+                </FlowPane>
+            </VBox>
+            <Region prefHeight="32" VBox.vgrow="ALWAYS"/>
+        </VBox>
+    </center>
+    <bottom>
+        <HBox styleClass="rodape" alignment="CENTER_LEFT" spacing="16">
+            <MenuButton styleClass="menu-operacoes" accessibleText="Perfil: administrar usuários">
+                <graphic>
+                    <StackPane styleClass="perfil-circulo"><ImageView fitWidth="20" fitHeight="20" preserveRatio="true"><image><Image url="@../images/perfil.png"/></image></ImageView></StackPane>
+                </graphic>
+                <items>
+                    <MenuItem text="Administrar usuários" onAction="#onAdministrarUsuarios"/>
+                </items>
+            </MenuButton>
+            <Label fx:id="rodapeNome" text="Administrador" styleClass="rodape-usuario" maxWidth="200"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Cadastrar Leitor" styleClass="botao-menu" onAction="#onCadastrarUsuario" prefWidth="155"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Cadastrar Empréstimo" styleClass="botao-menu" onAction="#onRealizarEmprestimo" prefWidth="175"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button styleClass="botao-sair" onAction="#onSair" accessibleText="Sair do sistema"><graphic><ImageView fitWidth="16" fitHeight="16" preserveRatio="true"><image><Image url="@../images/sair.png"/></image></ImageView></graphic></Button>
+        </HBox>
+    </bottom>
+</BorderPane>

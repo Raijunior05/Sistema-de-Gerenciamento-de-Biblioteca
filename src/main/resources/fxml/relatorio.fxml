@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="br.univasf.bibliotech.view.RelatorioController"
+      styleClass="tela-prototipo,relatorios" spacing="20">
+    <HBox alignment="CENTER_LEFT">
+        <Label text="R E L A T Ó R I O S" styleClass="titulo-tela"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="Voltar à visão geral" styleClass="botao-menu" onAction="#onVoltar"/>
+    </HBox>
+    <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+        <tabs>
+            <Tab text="Consultar Empréstimos"><content><VBox fx:id="areaEmprestimos" spacing="16"/></content></Tab>
+            <Tab text="Consultar Reservas"><content><VBox fx:id="areaReservas" spacing="16"/></content></Tab>
+        </tabs>
+    </TabPane>
+</VBox>
