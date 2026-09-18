@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<HBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="br.univasf.bibliotech.view.EmprestimoController"
+      styleClass="tela-prototipo,login" alignment="CENTER_LEFT" spacing="40">
+
+    <!-- Painel de Formulário (Esquerda) -->
+    <AnchorPane styleClass="painel,login-painel" prefWidth="380" minWidth="380"
+                prefHeight="540" minHeight="540" maxHeight="540">
+
+        <!-- Título -->
+        <Label text="REALIZAR EMPRÉSTIMO" styleClass="titulo-tela"
+               layoutX="18" layoutY="12" prefWidth="344" alignment="CENTER"/>
+
+        <!-- Nome do título (Combobox para seleção da obra) -->
+        <Label text="Nome do título:" styleClass="rotulo-campo" layoutX="20" layoutY="48"/>
+        <ComboBox fx:id="comboItem" promptText="Selecione um item..."
+                  layoutX="18" layoutY="68" prefWidth="344"/>
+
+        <!-- Seleção CPF ou Matrícula -->
+        <Label text="CPF ou Matrícula:" styleClass="rotulo-campo" layoutX="20" layoutY="116"/>
+        <fx:define>
+            <ToggleGroup fx:id="grupoTipoDoc"/>
+        </fx:define>
+        <RadioButton fx:id="radioCpf" toggleGroup="$grupoTipoDoc" selected="true"
+                     layoutX="20" layoutY="142"/>
+        <RadioButton fx:id="radioMatricula" toggleGroup="$grupoTipoDoc"
+                     layoutX="50" layoutY="142"/>
+        <TextField fx:id="campoDocumento" layoutX="82" layoutY="136" prefWidth="280"/>
+
+        <!-- Botão Identificar Usuário e Label com o Resultado -->
+        <Button text="Identificar Usuário" styleClass="botao-primario" onAction="#onIdentificarUsuario"
+                layoutX="18" layoutY="176" prefWidth="180" prefHeight="40"/>
+        <Label fx:id="rotuloUsuarioIdentificado" text="Nenhum usuário identificado"
+               styleClass="rotulo-campo" layoutX="20" layoutY="222" prefWidth="344"/>
+
+        <!-- Data de retirada (Três campos numéricos: Dia, Mês, Ano) -->
+        <Label text="Data de retirada:" styleClass="rotulo-campo" layoutX="20" layoutY="252"/>
+        <HBox layoutX="18" layoutY="276" spacing="8" prefWidth="344">
+            <VBox spacing="2">
+                <Label text="Dia:" styleClass="rotulo-campo" alignment="CENTER" prefWidth="108"/>
+                <TextField fx:id="campoDia" prefWidth="108" alignment="CENTER"/>
+            </VBox>
+            <VBox spacing="2">
+                <Label text="Mês:" styleClass="rotulo-campo" alignment="CENTER" prefWidth="108"/>
+                <TextField fx:id="campoMes" prefWidth="108" alignment="CENTER"/>
+            </VBox>
+            <VBox spacing="2">
+                <Label text="Ano:" styleClass="rotulo-campo" alignment="CENTER" prefWidth="112"/>
+                <TextField fx:id="campoAno" prefWidth="112" alignment="CENTER"/>
+            </VBox>
+        </HBox>
+
+        <!-- Informação do prazo previsto calculado pelo sistema -->
+        <Label fx:id="rotuloPrazoDevolucao" text="Prazo previsto: —"
+               styleClass="rotulo-campo" layoutX="20" layoutY="350" prefWidth="344"/>
+
+        <!-- Mensagens de Erro Inline -->
+        <Label fx:id="mensagemErro" styleClass="mensagem-erro" wrapText="true"
+               layoutX="18" layoutY="380" prefWidth="344" prefHeight="36"/>
+
+        <!-- Botões Cancelar e Concluído -->
+        <Button text="Cancelar" styleClass="botao-menu" onAction="#onCancelar"
+                layoutX="18" layoutY="474" prefWidth="155" prefHeight="46"/>
+        <Button fx:id="botaoSalvar" text="Concluído" styleClass="botao-primario"
+                onAction="#onSalvar" layoutX="207" layoutY="474" prefWidth="155"
+                prefHeight="46" defaultButton="true"/>
+    </AnchorPane>
+
+    <Region HBox.hgrow="ALWAYS"/>
+
+    <!-- Lado Direito (Marca SGB e Ilustração de Livros) -->
+    <VBox alignment="TOP_CENTER" spacing="4" prefWidth="330" minWidth="330" maxHeight="500">
+        <Label text="S G B" styleClass="marca-sgb,login-marca"/>
+        <Label text="Sistema de Gerenciamento de Bibliotecas" styleClass="marca-legenda"/>
+        <Region prefHeight="45"/>
+        <ImageView fitWidth="405" fitHeight="260" preserveRatio="true">
+            <image>
+                <Image url="@../images/livros.png"/>
+            </image>
+        </ImageView>
+    </VBox>
+</HBox>
