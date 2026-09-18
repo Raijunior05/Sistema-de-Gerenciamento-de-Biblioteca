@@ -7,10 +7,9 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 
-/** Tela inicial apos o login. Reune as entradas dos 13 casos de uso. */
+/** Tela inicial após o login. Reúne as entradas dos casos de uso. */
 public class VisaoGeralController {
 
-    @FXML private Label saudacao;
     @FXML private Label rodapeNome;
     @FXML private Label valorAtrasados;
     @FXML private Label valorEmprestados;
@@ -18,8 +17,9 @@ public class VisaoGeralController {
 
     @FXML
     private void initialize() {
-        saudacao.setText("Olá, " + Sessao.getPrimeiroNome());
-        rodapeNome.setText(Sessao.getAdministrador().getNome());
+        if (Sessao.estaAutenticado()) {
+            rodapeNome.setText(Sessao.getAdministrador().getNome());
+        }
         carregarIndicadores();
     }
 
@@ -46,41 +46,49 @@ public class VisaoGeralController {
         t.start();
     }
 
-    @FXML private void onAdministrarUsuarios() {
+    @FXML
+    private void onGerenciarUsuarios() {
         Navegador.irPara(Navegador.Tela.USUARIOS);
     }
 
-    @FXML private void onCadastrarItem() {
-        Navegador.irPara(Navegador.Tela.CADASTRO_ITEM);
-    }
-
-    @FXML private void onPesquisarAcervo() {
-        Navegador.irPara(Navegador.Tela.ACERVO);
-    }
-
-    @FXML private void onRealizarEmprestimo() {
+    @FXML
+    private void onRealizarEmprestimo() {
         Navegador.irPara(Navegador.Tela.EMPRESTIMO);
     }
 
-    @FXML private void onRealizarReserva() {
-        Navegador.irPara(Navegador.Tela.RESERVA);
-    }
-
-    @FXML private void onRealizarDevolucao() {
-        Navegador.irPara(Navegador.Tela.DEVOLUCAO);
-    }
-
-    @FXML private void onGerarRelatorio() {
+    @FXML
+    private void onConsultarEmprestimos() {
         Navegador.irPara(Navegador.Tela.RELATORIO);
     }
 
-    @FXML private void onCadastrarUsuario() {
-        Navegador.irPara(Navegador.Tela.CADASTRO_USUARIO);
+    @FXML
+    private void onRealizarReserva() {
+        Navegador.irPara(Navegador.Tela.RESERVA);
     }
 
-    @FXML private void onSair() {
-        if (Alertas.confirmar("Encerrar sessão",
-                "Deseja sair do sistema?")) {
+    @FXML
+    private void onGerarRelatorio() {
+        Navegador.irPara(Navegador.Tela.RELATORIO);
+    }
+
+    @FXML
+    private void onPesquisarAcervo() {
+        Navegador.irPara(Navegador.Tela.ACERVO);
+    }
+
+    @FXML
+    private void onCadastrarItem() {
+        Navegador.irPara(Navegador.Tela.CADASTRO_ITEM);
+    }
+
+    @FXML
+    private void onRealizarDevolucao() {
+        Navegador.irPara(Navegador.Tela.DEVOLUCAO);
+    }
+
+    @FXML
+    private void onSair() {
+        if (Alertas.confirmar("Encerrar sessão", "Deseja sair do sistema?")) {
             Sessao.encerrar();
             Navegador.irPara(Navegador.Tela.LOGIN);
         }

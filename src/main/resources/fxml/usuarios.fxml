@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="br.univasf.bibliotech.view.UsuariosController"
+            styleClass="tela-prototipo,inicial">
+
+    <!-- Cabeçalho -->
+    <top>
+        <HBox styleClass="cabecalho" alignment="CENTER_LEFT" spacing="16">
+            <VBox alignment="CENTER_LEFT">
+                <Label text="S G B" styleClass="marca-sgb,marca-pequena"/>
+                <Label text="Sistema de Gerenciamento de Bibliotecas" styleClass="marca-legenda,legenda-pequena"/>
+            </VBox>
+            <ImageView fitWidth="40" fitHeight="26" preserveRatio="true">
+                <image><Image url="@../images/livros.png"/></image>
+            </ImageView>
+            <Region HBox.hgrow="ALWAYS"/>
+        </HBox>
+    </top>
+
+    <!-- Painel de Administração de Usuários -->
+    <center>
+        <VBox styleClass="painel,inicial-painel" spacing="28" maxWidth="900" alignment="TOP_CENTER">
+            <BorderPane.margin><Insets top="20" right="40" bottom="20" left="40"/></BorderPane.margin>
+
+            <Label text="A D M I N I S T R A R  U S U Á R I O S" styleClass="titulo-tela" alignment="CENTER"/>
+
+            <!-- 4 Opções do Submenu -->
+            <GridPane hgap="24" vgap="20" alignment="CENTER">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="50"/>
+                    <ColumnConstraints percentWidth="50"/>
+                </columnConstraints>
+
+                <Button text="CADASTRAR USUÁRIO" styleClass="botao-menu" onAction="#onCadastrarUsuario"
+                        prefWidth="380" prefHeight="100" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+
+                <Button text="CONSULTAR USUÁRIO" styleClass="botao-menu" onAction="#onConsultarUsuario"
+                        prefWidth="380" prefHeight="100" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                <Button text="EDITAR USUÁRIO" styleClass="botao-menu" onAction="#onEditarUsuario"
+                        prefWidth="380" prefHeight="100" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+
+                <Button text="EXCLUIR USUÁRIO" styleClass="botao-menu" onAction="#onExcluirUsuario"
+                        prefWidth="380" prefHeight="100" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+            </GridPane>
+        </VBox>
+    </center>
+
+    <!-- Rodapé com o botão Voltar -->
+    <bottom>
+        <HBox styleClass="rodape" alignment="CENTER_LEFT" spacing="16">
+            <StackPane styleClass="perfil-circulo">
+                <ImageView fitWidth="20" fitHeight="20" preserveRatio="true">
+                    <image><Image url="@../images/perfil.png"/></image>
+                </ImageView>
+            </StackPane>
+            <Label fx:id="rodapeNome" text="Administrador" styleClass="rodape-usuario"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Voltar" styleClass="botao-primario" onAction="#onVoltar" prefWidth="140" prefHeight="40"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button styleClass="botao-sair" onAction="#onSair" accessibleText="Sair do sistema">
+                <graphic>
+                    <ImageView fitWidth="16" fitHeight="16" preserveRatio="true">
+                        <image><Image url="@../images/sair.png"/></image>
+                    </ImageView>
+                </graphic>
+            </Button>
+        </HBox>
+    </bottom>
+</BorderPane>

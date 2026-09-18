@@ -1,80 +1,106 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.MenuButton?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.FlowPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="br.univasf.bibliotech.view.VisaoGeralController" styleClass="tela-prototipo,inicial">
+            fx:controller="br.univasf.bibliotech.view.VisaoGeralController"
+            styleClass="tela-prototipo,inicial">
+    
+    <!-- Cabeçalho -->
     <top>
         <HBox styleClass="cabecalho" alignment="CENTER_LEFT" spacing="16">
-            <VBox alignment="CENTER">
+            <VBox alignment="CENTER_LEFT">
                 <Label text="S G B" styleClass="marca-sgb,marca-pequena"/>
                 <Label text="Sistema de Gerenciamento de Bibliotecas" styleClass="marca-legenda,legenda-pequena"/>
             </VBox>
-            <ImageView fitWidth="40" fitHeight="26" preserveRatio="true"><image><Image url="@../images/livros.png"/></image></ImageView>
+            <ImageView fitWidth="40" fitHeight="26" preserveRatio="true">
+                <image><Image url="@../images/livros.png"/></image>
+            </ImageView>
             <Region HBox.hgrow="ALWAYS"/>
-            <Label fx:id="saudacao" text="Olá, Administrador" styleClass="saudacao"/>
         </HBox>
     </top>
+
+    <!-- Conteúdo Central -->
     <center>
-        <VBox styleClass="painel,inicial-painel" spacing="0" maxWidth="1050">
-            <BorderPane.margin><Insets top="0" right="76" bottom="22" left="76"/></BorderPane.margin>
+        <VBox styleClass="painel,inicial-painel" spacing="20" maxWidth="1000" alignment="TOP_CENTER">
+            <BorderPane.margin><Insets top="10" right="40" bottom="20" left="40"/></BorderPane.margin>
+            
             <Label text="V I S Ã O  G E R A L" styleClass="titulo-tela" maxWidth="Infinity" alignment="CENTER"/>
-            <Region prefHeight="42" VBox.vgrow="ALWAYS"/>
-            <HBox spacing="16">
-                <VBox styleClass="cartao" spacing="6" prefWidth="240" HBox.hgrow="ALWAYS">
+
+            <!-- Cartões de Indicadores -->
+            <HBox spacing="16" alignment="CENTER">
+                <VBox styleClass="cartao" spacing="6" prefWidth="260" HBox.hgrow="ALWAYS">
                     <Label text="Livros Atrasados:" styleClass="cartao-rotulo"/>
-                    <Label fx:id="valorAtrasados" text="—" styleClass="cartao-valor"/>
+                    <Label fx:id="valorAtrasados" text="0" styleClass="cartao-valor"/>
                 </VBox>
-                <VBox styleClass="cartao" spacing="6" prefWidth="240" HBox.hgrow="ALWAYS">
+                <VBox styleClass="cartao" spacing="6" prefWidth="260" HBox.hgrow="ALWAYS">
                     <Label text="Livros Emprestados:" styleClass="cartao-rotulo"/>
-                    <Label fx:id="valorEmprestados" text="—" styleClass="cartao-valor"/>
+                    <Label fx:id="valorEmprestados" text="0" styleClass="cartao-valor"/>
                 </VBox>
-                <VBox styleClass="cartao" spacing="6" prefWidth="240" HBox.hgrow="ALWAYS">
+                <VBox styleClass="cartao" spacing="6" prefWidth="260" HBox.hgrow="ALWAYS">
                     <Label text="Reservas Pendentes:" styleClass="cartao-rotulo"/>
-                    <Label fx:id="valorReservas" text="—" styleClass="cartao-valor"/>
+                    <Label fx:id="valorReservas" text="0" styleClass="cartao-valor"/>
                 </VBox>
             </HBox>
-            <Region prefHeight="42" VBox.vgrow="ALWAYS"/>
-            <VBox styleClass="cartao,acesso-rapido" spacing="18">
-                <Label text="Acesso rápido:" styleClass="rotulo-secao"/>
-                <FlowPane hgap="12" vgap="12" prefWrapLength="744">
-                    <Button text="Gerar Relatório" styleClass="botao-menu" onAction="#onGerarRelatorio" prefWidth="190"/>
-                    <Button text="Pesquisar Acervo" styleClass="botao-menu" onAction="#onPesquisarAcervo" prefWidth="190"/>
-                    <Button text="Cadastrar item" styleClass="botao-menu" onAction="#onCadastrarItem" prefWidth="190"/>
-                    <Button text="Realizar reserva" styleClass="botao-menu" onAction="#onRealizarReserva" prefWidth="190"/>
-                    <Button text="Realizar devolução" styleClass="botao-menu" onAction="#onRealizarDevolucao" prefWidth="190"/>
-                </FlowPane>
+
+            <!-- Seção MENU: Grelha de 3 Colunas conforme a Imagem 1 -->
+            <VBox styleClass="cartao,acesso-rapido" spacing="12" alignment="TOP_CENTER" VBox.vgrow="ALWAYS">
+                <Label text="M E N U :" styleClass="rotulo-secao" alignment="CENTER"/>
+                
+                <GridPane hgap="16" vgap="14" alignment="CENTER">
+                    <!-- Coluna 1 -->
+                    <Button text="GERENCIAR USUÁRIOS" styleClass="botao-menu" onAction="#onGerenciarUsuarios"
+                            prefWidth="250" prefHeight="48" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <Button text="RESERVAR ITEM" styleClass="botao-menu" onAction="#onRealizarReserva"
+                            prefWidth="250" prefHeight="48" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                    <Button text="CADASTRAR ITEM" styleClass="botao-menu" onAction="#onCadastrarItem"
+                            prefWidth="250" prefHeight="48" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+
+                    <!-- Coluna 2 -->
+                    <Button text="REALIZAR EMPRÉSTIMO" styleClass="botao-menu" onAction="#onRealizarEmprestimo"
+                            prefWidth="250" prefHeight="48" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                    <Button text="GERAR RELATÓRIO" styleClass="botao-menu" onAction="#onGerarRelatorio"
+                            prefWidth="250" prefHeight="48" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                    <Button text="REALIZAR DEVOLUÇÃO" styleClass="botao-menu" onAction="#onRealizarDevolucao"
+                            prefWidth="250" prefHeight="48" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+                    <!-- Coluna 3 -->
+                    <Button text="CONSULTAR EMPRÉSTIMOS" styleClass="botao-menu" onAction="#onConsultarEmprestimos"
+                            prefWidth="250" prefHeight="48" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                    <Button text="PESQUISAR ACERVO" styleClass="botao-menu" onAction="#onPesquisarAcervo"
+                            prefWidth="250" prefHeight="48" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+                </GridPane>
             </VBox>
-            <Region prefHeight="32" VBox.vgrow="ALWAYS"/>
         </VBox>
     </center>
+
+    <!-- Rodapé -->
     <bottom>
         <HBox styleClass="rodape" alignment="CENTER_LEFT" spacing="16">
-            <MenuButton styleClass="menu-operacoes" accessibleText="Perfil: administrar usuários">
+            <StackPane styleClass="perfil-circulo">
+                <ImageView fitWidth="20" fitHeight="20" preserveRatio="true">
+                    <image><Image url="@../images/perfil.png"/></image>
+                </ImageView>
+            </StackPane>
+            <Label fx:id="rodapeNome" text="Administrador" styleClass="rodape-usuario"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button styleClass="botao-sair" onAction="#onSair" accessibleText="Sair do sistema">
                 <graphic>
-                    <StackPane styleClass="perfil-circulo"><ImageView fitWidth="20" fitHeight="20" preserveRatio="true"><image><Image url="@../images/perfil.png"/></image></ImageView></StackPane>
+                    <ImageView fitWidth="16" fitHeight="16" preserveRatio="true">
+                        <image><Image url="@../images/sair.png"/></image>
+                    </ImageView>
                 </graphic>
-                <items>
-                    <MenuItem text="Administrar usuários" onAction="#onAdministrarUsuarios"/>
-                </items>
-            </MenuButton>
-            <Label fx:id="rodapeNome" text="Administrador" styleClass="rodape-usuario" maxWidth="200"/>
-            <Region HBox.hgrow="ALWAYS"/>
-            <Button text="Cadastrar Leitor" styleClass="botao-menu" onAction="#onCadastrarUsuario" prefWidth="155"/>
-            <Region HBox.hgrow="ALWAYS"/>
-            <Button text="Cadastrar Empréstimo" styleClass="botao-menu" onAction="#onRealizarEmprestimo" prefWidth="175"/>
-            <Region HBox.hgrow="ALWAYS"/>
-            <Button styleClass="botao-sair" onAction="#onSair" accessibleText="Sair do sistema"><graphic><ImageView fitWidth="16" fitHeight="16" preserveRatio="true"><image><Image url="@../images/sair.png"/></image></ImageView></graphic></Button>
+            </Button>
         </HBox>
     </bottom>
 </BorderPane>
