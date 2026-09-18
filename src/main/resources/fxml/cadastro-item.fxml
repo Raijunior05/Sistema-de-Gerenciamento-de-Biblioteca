@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<HBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="br.univasf.bibliotech.view.CadastroItemController"
+      styleClass="tela-prototipo,login" alignment="CENTER_LEFT" spacing="40">
+
+    <!-- Painel de Formulário (Esquerda) -->
+    <AnchorPane styleClass="painel,login-painel" prefWidth="380" minWidth="380"
+                prefHeight="540" minHeight="540" maxHeight="540">
+
+        <!-- Título da Tela -->
+        <Label fx:id="tituloTela" text="C A D A S T R A R  I T E M" styleClass="titulo-tela"
+               layoutX="18" layoutY="12" prefWidth="344" alignment="CENTER"/>
+
+        <!-- Título do Item -->
+        <Label text="Título:" styleClass="rotulo-campo" layoutX="20" layoutY="48"/>
+        <TextField fx:id="campoTitulo" layoutX="18" layoutY="68" prefWidth="344"/>
+
+        <!-- Autor -->
+        <Label text="Autor:" styleClass="rotulo-campo" layoutX="20" layoutY="110"/>
+        <TextField fx:id="campoAutor" layoutX="18" layoutY="130" prefWidth="344"/>
+
+        <!-- Seleção ISBN / Identificador e Campo de Texto -->
+        <Label text="ISBN ou Identificador:" styleClass="rotulo-campo" layoutX="20" layoutY="172"/>
+        <fx:define>
+            <ToggleGroup fx:id="grupoTipoIdentificador"/>
+        </fx:define>
+        <RadioButton fx:id="radioIsbn" toggleGroup="$grupoTipoIdentificador" selected="true"
+                     layoutX="20" layoutY="198"/>
+        <RadioButton fx:id="radioOutro" toggleGroup="$grupoTipoIdentificador"
+                     layoutX="50" layoutY="198"/>
+        <TextField fx:id="campoIsbn" layoutX="82" layoutY="192" prefWidth="280"/>
+
+        <!-- Editora -->
+        <Label text="Editora:" styleClass="rotulo-campo" layoutX="20" layoutY="234"/>
+        <TextField fx:id="campoEditora" layoutX="18" layoutY="254" prefWidth="344"/>
+
+        <!-- Ano e Quantidade lado a lado -->
+        <Label text="Ano:" styleClass="rotulo-campo" layoutX="20" layoutY="296"/>
+        <TextField fx:id="campoAno" layoutX="18" layoutY="316" prefWidth="164"/>
+
+        <Label text="Quantidade:" styleClass="rotulo-campo" layoutX="198" layoutY="296"/>
+        <TextField fx:id="campoQuantidade" layoutX="198" layoutY="316" prefWidth="164"/>
+
+        <!-- Tipo do Item e Categoria (Apoio) -->
+        <Label text="Tipo / Categoria:" styleClass="rotulo-campo" layoutX="20" layoutY="358"/>
+        <HBox layoutX="18" layoutY="378" spacing="8" prefWidth="344">
+            <ComboBox fx:id="comboTipo" prefWidth="168"/>
+            <TextField fx:id="campoCategoria" promptText="Categoria" prefWidth="168"/>
+        </HBox>
+
+        <!-- Mensagem de Erro / Duplicidade Inline -->
+        <Label fx:id="mensagemErro" styleClass="mensagem-erro" wrapText="true"
+               layoutX="18" layoutY="430" prefWidth="344" prefHeight="32"/>
+
+        <!-- Botões Cancelar e Concluído -->
+        <Button text="Cancelar" styleClass="botao-menu" onAction="#onCancelar"
+                layoutX="18" layoutY="474" prefWidth="155" prefHeight="46"/>
+        <Button fx:id="botaoSalvar" text="Concluído" styleClass="botao-primario"
+                onAction="#onSalvar" layoutX="207" layoutY="474" prefWidth="155"
+                prefHeight="46" defaultButton="true"/>
+    </AnchorPane>
+
+    <Region HBox.hgrow="ALWAYS"/>
+
+    <!-- Lado Direito (Marca SGB e Ilustração) -->
+    <VBox alignment="TOP_CENTER" spacing="4" prefWidth="330" minWidth="330" maxHeight="500">
+        <Label text="S G B" styleClass="marca-sgb,login-marca"/>
+        <Label text="Sistema de Gerenciamento de Bibliotecas" styleClass="marca-legenda"/>
+        <Region prefHeight="45"/>
+        <ImageView fitWidth="405" fitHeight="260" preserveRatio="true">
+            <image>
+                <Image url="@../images/livros.png"/>
+            </image>
+        </ImageView>
+    </VBox>
+</HBox>
