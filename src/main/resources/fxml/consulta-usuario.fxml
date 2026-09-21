@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="br.univasf.bibliotech.view.ConsultaUsuarioController"
+            styleClass="tela-prototipo,inicial,consulta-usuario">
+
+    <!-- CABEÇALHO -->
+    <top>
+
+        <HBox styleClass="cabecalho"
+              alignment="CENTER_LEFT"
+              spacing="16">
+
+            <VBox alignment="CENTER_LEFT">
+
+                <Label text="S G B"
+                       styleClass="marca-sgb,marca-pequena"/>
+
+                <Label text="Sistema de Gerenciamento de Bibliotecas"
+                       styleClass="marca-legenda,legenda-pequena"/>
+
+            </VBox>
+
+            <ImageView fitWidth="40"
+                       fitHeight="26"
+                       preserveRatio="true">
+
+                <image>
+                    <Image url="@../images/livros.png"/>
+                </image>
+
+            </ImageView>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+        </HBox>
+
+    </top>
+
+
+    <!-- CONTEÚDO -->
+    <center>
+
+        <VBox styleClass="painel,consulta-painel"
+              spacing="18"
+              maxWidth="900"
+              alignment="TOP_CENTER">
+
+            <BorderPane.margin>
+
+                <Insets top="25"
+                        right="70"
+                        bottom="25"
+                        left="70"/>
+
+            </BorderPane.margin>
+
+            <Label text="C O N S U L T A R   U S U Á R I O"
+                   styleClass="titulo-tela"
+                   alignment="CENTER"/>
+
+            <!-- PESQUISA -->
+            <VBox spacing="5">
+
+                <Label text="Nome:"
+                       styleClass="rotulo-campo"/>
+
+                <HBox spacing="5">
+
+                    <TextField fx:id="campoNome"
+                               promptText="Digite o nome do usuário"
+                               styleClass="campo-busca"
+                               onAction="#onPesquisar"
+                               HBox.hgrow="ALWAYS"/>
+
+                    <Button text="⌕"
+                            styleClass="botao-busca"
+                            onAction="#onPesquisar"
+                            prefWidth="50"/>
+
+                </HBox>
+
+            </VBox>
+
+
+            <!-- RESULTADOS -->
+            <TableView fx:id="tabelaUsuarios"
+                       prefHeight="260"
+                       VBox.vgrow="ALWAYS"
+                       styleClass="tabela-consulta">
+
+                <columns>
+
+                    <TableColumn fx:id="colunaNome"
+                                 text="NOME"
+                                 prefWidth="190"/>
+
+                    <TableColumn fx:id="colunaEmail"
+                                 text="E-MAIL"
+                                 prefWidth="220"/>
+
+                    <TableColumn fx:id="colunaIdentificacao"
+                                 text="CPF / MATRÍCULA"
+                                 prefWidth="150"/>
+
+                    <TableColumn fx:id="colunaPerfil"
+                                 text="PERFIL"
+                                 prefWidth="120"/>
+
+                    <TableColumn fx:id="colunaStatus"
+                                 text="STATUS"
+                                 prefWidth="90"/>
+
+                </columns>
+
+            </TableView>
+
+        </VBox>
+
+    </center>
+
+
+    <!-- RODAPÉ -->
+    <bottom>
+
+        <HBox styleClass="rodape"
+              alignment="CENTER_LEFT"
+              spacing="16">
+
+            <StackPane styleClass="perfil-circulo">
+
+                <ImageView fitWidth="20"
+                           fitHeight="20"
+                           preserveRatio="true">
+
+                    <image>
+                        <Image url="@../images/perfil.png"/>
+                    </image>
+
+                </ImageView>
+
+            </StackPane>
+
+            <Label fx:id="rodapeNome"
+                   text="Administrador"
+                   styleClass="rodape-usuario"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <Button text="Voltar"
+                    styleClass="botao-primario"
+                    onAction="#onVoltar"
+                    prefWidth="140"
+                    prefHeight="40"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <Button styleClass="botao-sair"
+                    onAction="#onSair"
+                    accessibleText="Sair do sistema">
+
+                <graphic>
+
+                    <ImageView fitWidth="16"
+                               fitHeight="16"
+                               preserveRatio="true">
+
+                        <image>
+                            <Image url="@../images/sair.png"/>
+                        </image>
+
+                    </ImageView>
+
+                </graphic>
+
+            </Button>
+
+        </HBox>
+
+    </bottom>
+
+</BorderPane>

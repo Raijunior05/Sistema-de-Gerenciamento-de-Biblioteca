@@ -22,9 +22,12 @@ public class UsuariosController {
     }
 
     @FXML
-    private void onConsultarUsuario() {
-        Alertas.aviso("Em desenvolvimento", "A tela de consulta de usuários será aberta aqui.");
-    }
+private void onConsultarUsuario() {
+
+    Navegador.irPara(
+            Navegador.Tela.CONSULTA_USUARIO
+    );
+}
 
     @FXML
     private void onEditarUsuario() {
