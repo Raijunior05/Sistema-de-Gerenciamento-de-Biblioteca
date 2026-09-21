@@ -21,69 +21,70 @@
 
     <!-- CABEÇALHO -->
     <top>
-
         <HBox styleClass="cabecalho"
               alignment="CENTER_LEFT"
-              spacing="16">
+              spacing="12">
 
             <VBox alignment="CENTER_LEFT">
-
                 <Label text="S G B"
                        styleClass="marca-sgb,marca-pequena"/>
 
                 <Label text="Sistema de Gerenciamento de Bibliotecas"
                        styleClass="marca-legenda,legenda-pequena"/>
-
             </VBox>
 
-            <ImageView fitWidth="40"
-                       fitHeight="26"
+            <ImageView fitWidth="35"
+                       fitHeight="25"
                        preserveRatio="true">
-
                 <image>
                     <Image url="@../images/livros.png"/>
                 </image>
-
             </ImageView>
 
             <Region HBox.hgrow="ALWAYS"/>
 
         </HBox>
-
     </top>
 
 
-    <!-- CONTEÚDO -->
+    <!-- ÁREA PRINCIPAL -->
     <center>
 
-        <VBox styleClass="painel,consulta-painel"
-              spacing="18"
-              maxWidth="900"
+        <VBox fx:id="painelConsulta"
+              styleClass="painel,consulta-painel"
+              spacing="16"
+              prefWidth="760"
+              maxWidth="760"
               alignment="TOP_CENTER">
 
             <BorderPane.margin>
-
-                <Insets top="25"
-                        right="70"
-                        bottom="25"
-                        left="70"/>
-
+                <Insets top="60"
+                        right="80"
+                        bottom="60"
+                        left="80"/>
             </BorderPane.margin>
 
+
+            <!-- TÍTULO -->
             <Label text="C O N S U L T A R   U S U Á R I O"
                    styleClass="titulo-tela"
                    alignment="CENTER"/>
 
-            <!-- PESQUISA -->
-            <VBox spacing="5">
+
+            <!-- ÁREA DA BUSCA -->
+            <VBox fx:id="areaBusca"
+                  spacing="5"
+                  maxWidth="700">
 
                 <Label text="Nome:"
                        styleClass="rotulo-campo"/>
 
-                <HBox spacing="5">
+                <HBox alignment="CENTER"
+                      spacing="0"
+                      styleClass="caixa-pesquisa">
 
                     <TextField fx:id="campoNome"
-                               promptText="Digite o nome do usuário"
+                               promptText=""
                                styleClass="campo-busca"
                                onAction="#onPesquisar"
                                HBox.hgrow="ALWAYS"/>
@@ -91,40 +92,34 @@
                     <Button text="⌕"
                             styleClass="botao-busca"
                             onAction="#onPesquisar"
-                            prefWidth="50"/>
+                            prefWidth="45"/>
 
                 </HBox>
 
             </VBox>
 
 
-            <!-- RESULTADOS -->
+            <!-- TABELA - COMEÇA ESCONDIDA -->
             <TableView fx:id="tabelaUsuarios"
-                       prefHeight="260"
-                       VBox.vgrow="ALWAYS"
+                       visible="false"
+                       managed="false"
+                       prefHeight="290"
+                       maxWidth="700"
                        styleClass="tabela-consulta">
 
                 <columns>
 
-                    <TableColumn fx:id="colunaNome"
-                                 text="NOME"
-                                 prefWidth="190"/>
+                    <TableColumn fx:id="colunaMatricula"
+                                 text="MATRÍCULA"
+                                 prefWidth="180"/>
 
-                    <TableColumn fx:id="colunaEmail"
-                                 text="E-MAIL"
-                                 prefWidth="220"/>
+                    <TableColumn fx:id="colunaUsuario"
+                                 text="USUÁRIO"
+                                 prefWidth="400"/>
 
-                    <TableColumn fx:id="colunaIdentificacao"
-                                 text="CPF / MATRÍCULA"
-                                 prefWidth="150"/>
-
-                    <TableColumn fx:id="colunaPerfil"
-                                 text="PERFIL"
+                    <TableColumn fx:id="colunaAcoes"
+                                 text="AÇÕES"
                                  prefWidth="120"/>
-
-                    <TableColumn fx:id="colunaStatus"
-                                 text="STATUS"
-                                 prefWidth="90"/>
 
                 </columns>
 
@@ -143,17 +138,13 @@
               spacing="16">
 
             <StackPane styleClass="perfil-circulo">
-
                 <ImageView fitWidth="20"
                            fitHeight="20"
                            preserveRatio="true">
-
                     <image>
                         <Image url="@../images/perfil.png"/>
                     </image>
-
                 </ImageView>
-
             </StackPane>
 
             <Label fx:id="rodapeNome"
@@ -171,21 +162,15 @@
             <Region HBox.hgrow="ALWAYS"/>
 
             <Button styleClass="botao-sair"
-                    onAction="#onSair"
-                    accessibleText="Sair do sistema">
+                    onAction="#onSair">
 
                 <graphic>
-
                     <ImageView fitWidth="16"
-                               fitHeight="16"
-                               preserveRatio="true">
-
+                               fitHeight="16">
                         <image>
                             <Image url="@../images/sair.png"/>
                         </image>
-
                     </ImageView>
-
                 </graphic>
 
             </Button>

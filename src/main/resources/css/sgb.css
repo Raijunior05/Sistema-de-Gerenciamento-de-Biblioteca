@@ -366,63 +366,258 @@
 .relatorios .table-view .column-header, .relatorios .table-view .filler {
     -fx-background-color: -fx-navy-600;
 }
-/* ---------- Consulta de usuários ---------- */
+/* =========================================================
+   CONSULTAR USUÁRIO
+   ========================================================= */
 
 .consulta-painel {
-    -fx-background-color: rgba(217,217,217,0.20);
+
+    -fx-background-color:
+        rgba(217,217,217,0.20);
+
     -fx-background-radius: 22px;
 
-    -fx-border-color: rgba(240,244,248,0.18);
+    -fx-border-color:
+        rgba(240,244,248,0.18);
+
     -fx-border-radius: 22px;
+
     -fx-border-width: 1px;
 
-    -fx-padding: 18px 20px 22px 20px;
+    -fx-padding:
+        20px 20px 25px 20px;
+
+    -fx-min-height: 150px;
 }
+
+
+/* Título */
+
+.consulta-usuario .titulo-tela {
+
+    -fx-font-size: 18px;
+
+    -fx-text-fill: -fx-gold;
+
+    -fx-font-weight: bold;
+}
+
+
+/* Campo de pesquisa */
+
+.caixa-pesquisa {
+
+    -fx-background-color:
+        rgba(217,217,217,0.20);
+
+    -fx-background-radius: 22px;
+
+    -fx-border-radius: 22px;
+
+    -fx-border-color:
+        rgba(240,244,248,0.12);
+}
+
 
 .consulta-usuario .campo-busca {
-    -fx-background-color: rgba(217,217,217,0.20);
 
-    -fx-background-radius: 20px;
-    -fx-border-radius: 20px;
+    -fx-background-color: transparent;
 
-    -fx-border-color: rgba(240,244,248,0.15);
-
-    -fx-pref-height: 40px;
+    -fx-border-color: transparent;
 
     -fx-text-fill: white;
+
+    -fx-pref-height: 38px;
+
+    -fx-padding:
+        5px 12px;
 }
+
 
 .consulta-usuario .campo-busca:focused {
-    -fx-border-color: -fx-gold;
+
+    -fx-border-color: transparent;
 }
 
+
+/* Lupa */
+
 .consulta-usuario .botao-busca {
+
     -fx-background-color: transparent;
+
     -fx-text-fill: -fx-gold;
-    -fx-font-size: 22px;
+
+    -fx-font-size: 16px;
+
     -fx-cursor: hand;
+
+    -fx-border-color: transparent;
 }
+
+
+/* =========================================================
+   TABELA - CONSULTAR USUÁRIO
+   ========================================================= */
 
 .consulta-usuario .tabela-consulta {
     -fx-background-color: transparent;
-
-    -fx-border-color: rgba(240,244,248,0.15);
-    -fx-border-radius: 12px;
-    -fx-background-radius: 12px;
+    -fx-border-color: rgba(197,160,89,0.35);
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
 }
 
+
+/* fundo do cabeçalho */
 .consulta-usuario .tabela-consulta .column-header-background {
-    -fx-background-color: rgba(74,85,104,0.85);
+    -fx-background-color: rgba(197,160,89,0.12);
 }
 
-.consulta-usuario .tabela-consulta .table-row-cell {
-    -fx-background-color: rgba(45,55,72,0.85);
+
+/* cada coluna do cabeçalho */
+.consulta-usuario .tabela-consulta .column-header,
+.consulta-usuario .tabela-consulta .filler {
+    -fx-background-color: rgba(45,55,72,0.95);
+
+    -fx-border-color:
+        transparent
+        rgba(197,160,89,0.25)
+        rgba(197,160,89,0.25)
+        transparent;
 }
+
+
+/* texto MATRÍCULA / USUÁRIO / AÇÕES */
+.consulta-usuario .tabela-consulta .column-header .label {
+    -fx-text-fill: -fx-gold;
+
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+
+    -fx-alignment: CENTER_LEFT;
+
+    -fx-padding: 6px 4px;
+}
+
+
+/* linhas */
+.consulta-usuario .tabela-consulta .table-row-cell {
+    -fx-background-color: rgba(45,55,72,0.88);
+
+    -fx-border-color:
+        transparent
+        transparent
+        rgba(240,244,248,0.08)
+        transparent;
+
+    -fx-cell-size: 42px;
+}
+
 
 .consulta-usuario .tabela-consulta .table-row-cell:odd {
-    -fx-background-color: rgba(20,37,77,0.85);
+    -fx-background-color: rgba(20,37,77,0.88);
 }
 
+
+/* linha selecionada */
 .consulta-usuario .tabela-consulta .table-row-cell:selected {
-    -fx-background-color: -fx-navy-600;
+    -fx-background-color: rgba(74,85,104,0.95);
+}
+
+
+/* texto das células */
+.consulta-usuario .tabela-consulta .table-cell {
+    -fx-text-fill: -fx-claro;
+
+    -fx-font-size: 12px;
+
+    -fx-alignment: CENTER_LEFT;
+
+    -fx-padding: 6px 10px;
+
+    -fx-border-color: transparent;
+}
+
+
+/* =========================================================
+   BOTÃO DA COLUNA AÇÕES
+   ========================================================= */
+
+.consulta-usuario .botao-acao-consulta {
+    -fx-background-color: transparent;
+
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+
+    -fx-text-fill: -fx-gold;
+
+    -fx-font-size: 15px;
+
+    -fx-padding: 0;
+
+    -fx-min-width: 25px;
+    -fx-pref-width: 25px;
+    -fx-max-width: 25px;
+
+    -fx-min-height: 25px;
+    -fx-pref-height: 25px;
+    -fx-max-height: 25px;
+
+    -fx-cursor: hand;
+}
+
+
+.consulta-usuario .botao-acao-consulta:hover {
+    -fx-background-color: rgba(197,160,89,0.15);
+
+    -fx-background-radius: 50%;
+}
+
+
+/* tira aquela borda azul ao clicar */
+.consulta-usuario .botao-acao-consulta:focused {
+    -fx-border-color: transparent;
+    -fx-background-color: transparent;
+}
+
+
+/* =========================================================
+   SCROLLBAR
+   ========================================================= */
+
+/* esconde a barra horizontal */
+.consulta-usuario .tabela-consulta .scroll-bar:horizontal {
+    -fx-pref-height: 0;
+    -fx-max-height: 0;
+    -fx-opacity: 0;
+}
+
+
+/* deixa a vertical discreta */
+.consulta-usuario .tabela-consulta .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 8px;
+}
+
+
+.consulta-usuario .tabela-consulta .scroll-bar:vertical .thumb {
+    -fx-background-color: rgba(197,160,89,0.35);
+    -fx-background-radius: 10px;
+}
+
+
+.consulta-usuario .tabela-consulta .scroll-bar .increment-button,
+.consulta-usuario .tabela-consulta .scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+
+/* canto inferior direito */
+.consulta-usuario .tabela-consulta .corner {
+    -fx-background-color: transparent;
 }
