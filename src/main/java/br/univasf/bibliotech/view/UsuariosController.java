@@ -28,11 +28,13 @@ private void onConsultarUsuario() {
             Navegador.Tela.CONSULTA_USUARIO
     );
 }
+@FXML
+private void onEditarUsuario() {
 
-    @FXML
-    private void onEditarUsuario() {
-        Alertas.aviso("Em desenvolvimento", "A tela de edição de usuários será aberta aqui.");
-    }
+    Navegador.irPara(
+            Navegador.Tela.EDITAR_USUARIO
+    );
+}
 
     @FXML
     private void onExcluirUsuario() {
