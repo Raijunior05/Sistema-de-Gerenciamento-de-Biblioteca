@@ -47,13 +47,14 @@
 
     <!-- ÁREA PRINCIPAL -->
     <center>
-    <ScrollPane hbarPolicy="ALWAYS"
+    <ScrollPane hbarPolicy="NEVER"
                  vbarPolicy="AS_NEEDED"
                  fitToHeight="true"
-                 fitToWidth="false"
-                 pannable="true"
+                 fitToWidth="true"
+                 pannable="false"
                  styleClass="acervo-scroll-pane">
 
+        <StackPane alignment="TOP_CENTER">
         <VBox fx:id="painelConsulta"
               styleClass="painel,consulta-painel"
               spacing="16"
@@ -139,6 +140,7 @@
             </TableView>
 
         </VBox>
+        </StackPane>
     </ScrollPane>
 </center>
 
