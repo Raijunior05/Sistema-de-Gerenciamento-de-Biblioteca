@@ -183,45 +183,206 @@
     -fx-text-fill: -fx-verde-100;
 }
 
-/* ---------- Tabelas ---------- */
 
-.table-view {
+/* =========================================================
+   TABELAS - PADRÃO ÚNICO DO SISTEMA
+   Mesmo visual da tela CONSULTAR USUÁRIO
+   ========================================================= */
+
+.table-view,
+.tabela-consulta {
     -fx-background-color: transparent;
-    -fx-border-color: -fx-navy-600;
-    -fx-border-radius: 2px;
+    -fx-border-color: rgba(197,160,89,0.35);
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+    -fx-padding: 0;
 }
 
-.table-view .column-header-background {
-    -fx-background-color: -fx-navy-600;
+
+/* Fundo geral do cabeçalho */
+.table-view .column-header-background,
+.tabela-consulta .column-header-background {
+    -fx-background-color: rgba(197,160,89,0.12);
 }
 
-.table-view .column-header .label {
+
+/* Cada coluna do cabeçalho */
+.table-view .column-header,
+.table-view .filler,
+.tabela-consulta .column-header,
+.tabela-consulta .filler {
+    -fx-background-color: rgba(45,55,72,0.95);
+
+    -fx-border-color:
+        transparent
+        rgba(197,160,89,0.25)
+        rgba(197,160,89,0.25)
+        transparent;
+}
+
+
+/* Texto dos títulos das colunas */
+.table-view .column-header .label,
+.tabela-consulta .column-header .label {
     -fx-text-fill: -fx-gold;
-    -fx-font-size: 12px;
-    -fx-letter-spacing: 1px;
-    -fx-alignment: center-left;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 6px 4px;
+    -fx-letter-spacing: 0px;
 }
 
-.table-view .table-row-cell {
-    -fx-background-color: -fx-navy-700;
-    -fx-border-color: transparent transparent -fx-navy-600 transparent;
+
+/* Linhas */
+.table-view .table-row-cell,
+.tabela-consulta .table-row-cell {
+    -fx-background-color: rgba(45,55,72,0.88);
+
+    -fx-border-color:
+        transparent
+        transparent
+        rgba(240,244,248,0.08)
+        transparent;
+
+    -fx-cell-size: 42px;
 }
 
-.table-view .table-row-cell:odd {
-    -fx-background-color: -fx-navy-800;
+
+/* Linhas alternadas */
+.table-view .table-row-cell:odd,
+.tabela-consulta .table-row-cell:odd {
+    -fx-background-color: rgba(20,37,77,0.88);
 }
 
-.table-view .table-row-cell:selected {
-    -fx-background-color: -fx-navy-600;
+
+/* Linha selecionada */
+.table-view .table-row-cell:selected,
+.tabela-consulta .table-row-cell:selected {
+    -fx-background-color: rgba(74,85,104,0.95);
 }
 
-.table-view .table-cell {
+
+/* Texto das células */
+.table-view .table-cell,
+.tabela-consulta .table-cell {
     -fx-text-fill: -fx-claro;
-    -fx-padding: 10px 12px;
+    -fx-font-size: 12px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 6px 10px;
+    -fx-border-color: transparent;
 }
 
-.table-view .placeholder .label {
+
+/* Mantém o texto claro quando selecionado */
+.table-view .table-row-cell:selected .table-cell,
+.tabela-consulta .table-row-cell:selected .table-cell {
+    -fx-text-fill: -fx-claro;
+}
+
+
+/* Mensagem quando a tabela está vazia */
+.table-view .placeholder,
+.tabela-consulta .placeholder {
+    -fx-background-color: transparent;
+}
+
+.table-view .placeholder .label,
+.tabela-consulta .placeholder .label {
     -fx-text-fill: -fx-cinza-200;
+}
+
+
+/* =========================================================
+   BOTÕES DA COLUNA AÇÕES
+   ========================================================= */
+
+.botao-acao-consulta,
+.botao-acao-tabela,
+.botao-excluir-usuario {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+
+    -fx-text-fill: -fx-gold;
+
+    -fx-font-size: 15px;
+
+    -fx-padding: 0;
+
+    -fx-min-width: 25px;
+    -fx-pref-width: 25px;
+    -fx-max-width: 25px;
+
+    -fx-min-height: 25px;
+    -fx-pref-height: 25px;
+    -fx-max-height: 25px;
+
+    -fx-cursor: hand;
+}
+
+.botao-acao-consulta:hover,
+.botao-acao-tabela:hover,
+.botao-excluir-usuario:hover {
+    -fx-background-color: rgba(197,160,89,0.15);
+    -fx-background-radius: 50%;
+}
+
+.botao-acao-consulta:focused,
+.botao-acao-tabela:focused,
+.botao-excluir-usuario:focused {
+    -fx-border-color: transparent;
+    -fx-background-color: transparent;
+}
+
+
+/* =========================================================
+   SCROLLBAR DAS TABELAS
+   ========================================================= */
+
+/* Esconde a barra horizontal */
+.table-view .scroll-bar:horizontal,
+.tabela-consulta .scroll-bar:horizontal {
+    -fx-pref-height: 0;
+    -fx-max-height: 0;
+    -fx-opacity: 0;
+}
+
+
+/* Barra vertical discreta */
+.table-view .scroll-bar:vertical,
+.tabela-consulta .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 8px;
+}
+
+.table-view .scroll-bar:vertical .thumb,
+.tabela-consulta .scroll-bar:vertical .thumb {
+    -fx-background-color: rgba(197,160,89,0.35);
+    -fx-background-radius: 10px;
+}
+
+.table-view .scroll-bar:vertical .thumb:hover,
+.tabela-consulta .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: rgba(197,160,89,0.60);
+}
+
+.table-view .scroll-bar .increment-button,
+.table-view .scroll-bar .decrement-button,
+.tabela-consulta .scroll-bar .increment-button,
+.tabela-consulta .scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+
+/* Canto inferior direito */
+.table-view .corner,
+.tabela-consulta .corner {
+    -fx-background-color: transparent;
 }
 
 /* ---------- Badges de status ---------- */
@@ -363,9 +524,7 @@
 .tela-prototipo { -fx-font-family: "Montserrat"; }
 .login .text-field { -fx-min-height: 45px; }
 .login .button { -fx-min-height: 50px; }
-.relatorios .table-view .column-header, .relatorios .table-view .filler {
-    -fx-background-color: -fx-navy-600;
-}
+
 /* =========================================================
    CONSULTAR USUÁRIO
    ========================================================= */
@@ -457,39 +616,58 @@
 
 
 /* =========================================================
-   TABELA - CONSULTAR USUÁRIO
+   TABELA PADRÃO DE USUÁRIOS
+
+   CONSULTAR
+   EDITAR
+   EXCLUIR
+
+   TODAS USAM EXATAMENTE O MESMO ESTILO
    ========================================================= */
 
-.consulta-usuario .tabela-consulta {
+.tela-prototipo .tabela-consulta {
+
     -fx-background-color: transparent;
+
     -fx-border-color: rgba(197,160,89,0.35);
     -fx-border-width: 1px;
+
     -fx-border-radius: 4px;
     -fx-background-radius: 4px;
+
+    -fx-padding: 0;
 }
 
 
-/* fundo do cabeçalho */
-.consulta-usuario .tabela-consulta .column-header-background {
+/* =========================================================
+   CABEÇALHO DA TABELA
+   ========================================================= */
+
+.tela-prototipo .tabela-consulta .column-header-background {
+
     -fx-background-color: rgba(197,160,89,0.12);
 }
 
 
-/* cada coluna do cabeçalho */
-.consulta-usuario .tabela-consulta .column-header,
-.consulta-usuario .tabela-consulta .filler {
+.tela-prototipo .tabela-consulta .column-header,
+.tela-prototipo .tabela-consulta .filler {
+
     -fx-background-color: rgba(45,55,72,0.95);
 
     -fx-border-color:
-        transparent
-        rgba(197,160,89,0.25)
-        rgba(197,160,89,0.25)
-        transparent;
+            transparent
+            rgba(197,160,89,0.25)
+            rgba(197,160,89,0.25)
+            transparent;
+
+    -fx-border-width: 0px 1px 1px 0px;
 }
 
 
-/* texto MATRÍCULA / USUÁRIO / AÇÕES */
-.consulta-usuario .tabela-consulta .column-header .label {
+/* MATRÍCULA / USUÁRIO / AÇÕES */
+
+.tela-prototipo .tabela-consulta .column-header .label {
+
     -fx-text-fill: -fx-gold;
 
     -fx-font-size: 11px;
@@ -497,37 +675,54 @@
 
     -fx-alignment: CENTER_LEFT;
 
-    -fx-padding: 6px 4px;
+    -fx-padding: 6px 10px;
+
+    -fx-letter-spacing: 0px;
 }
 
 
-/* linhas */
-.consulta-usuario .tabela-consulta .table-row-cell {
+/* =========================================================
+   LINHAS
+   ========================================================= */
+
+.tela-prototipo .tabela-consulta .table-row-cell {
+
     -fx-background-color: rgba(45,55,72,0.88);
 
     -fx-border-color:
-        transparent
-        transparent
-        rgba(240,244,248,0.08)
-        transparent;
+            transparent
+            transparent
+            rgba(240,244,248,0.08)
+            transparent;
+
+    -fx-border-width: 0 0 1px 0;
 
     -fx-cell-size: 42px;
 }
 
 
-.consulta-usuario .tabela-consulta .table-row-cell:odd {
+/* Linha alternada */
+
+.tela-prototipo .tabela-consulta .table-row-cell:odd {
+
     -fx-background-color: rgba(20,37,77,0.88);
 }
 
 
-/* linha selecionada */
-.consulta-usuario .tabela-consulta .table-row-cell:selected {
+/* Linha selecionada */
+
+.tela-prototipo .tabela-consulta .table-row-cell:selected {
+
     -fx-background-color: rgba(74,85,104,0.95);
 }
 
 
-/* texto das células */
-.consulta-usuario .tabela-consulta .table-cell {
+/* =========================================================
+   TEXTO DAS CÉLULAS
+   ========================================================= */
+
+.tela-prototipo .tabela-consulta .table-cell {
+
     -fx-text-fill: -fx-claro;
 
     -fx-font-size: 12px;
@@ -540,14 +735,40 @@
 }
 
 
+.tela-prototipo .tabela-consulta .table-row-cell:selected .table-cell {
+
+    -fx-text-fill: -fx-claro;
+}
+
+
 /* =========================================================
-   BOTÃO DA COLUNA AÇÕES
+   TABELA VAZIA
    ========================================================= */
 
-.consulta-usuario .botao-acao-consulta {
+.tela-prototipo .tabela-consulta .placeholder {
+
+    -fx-background-color: transparent;
+}
+
+
+.tela-prototipo .tabela-consulta .placeholder .label {
+
+    -fx-text-fill: -fx-cinza-200;
+}
+
+
+/* =========================================================
+   BOTÃO DE AÇÕES
+
+   USADO EM CONSULTAR / EDITAR / EXCLUIR
+   ========================================================= */
+
+.tela-prototipo .botao-acao-consulta {
+
     -fx-background-color: transparent;
 
     -fx-background-insets: 0;
+
     -fx-background-radius: 0;
 
     -fx-border-color: transparent;
@@ -571,164 +792,80 @@
 }
 
 
-.consulta-usuario .botao-acao-consulta:hover {
+.tela-prototipo .botao-acao-consulta:hover {
+
     -fx-background-color: rgba(197,160,89,0.15);
 
     -fx-background-radius: 50%;
 }
 
 
-/* tira aquela borda azul ao clicar */
-.consulta-usuario .botao-acao-consulta:focused {
+.tela-prototipo .botao-acao-consulta:focused {
+
     -fx-border-color: transparent;
+
     -fx-background-color: transparent;
 }
 
 
 /* =========================================================
-   SCROLLBAR
+   BARRA HORIZONTAL
    ========================================================= */
 
-/* esconde a barra horizontal */
-.consulta-usuario .tabela-consulta .scroll-bar:horizontal {
+.tela-prototipo .tabela-consulta .scroll-bar:horizontal {
+
     -fx-pref-height: 0;
+
     -fx-max-height: 0;
+
     -fx-opacity: 0;
 }
 
-
-/* deixa a vertical discreta */
-.consulta-usuario .tabela-consulta .scroll-bar:vertical {
-    -fx-background-color: transparent;
-    -fx-pref-width: 8px;
-}
-
-
-.consulta-usuario .tabela-consulta .scroll-bar:vertical .thumb {
-    -fx-background-color: rgba(197,160,89,0.35);
-    -fx-background-radius: 10px;
-}
-
-
-.consulta-usuario .tabela-consulta .scroll-bar .increment-button,
-.consulta-usuario .tabela-consulta .scroll-bar .decrement-button {
-    -fx-background-color: transparent;
-    -fx-padding: 0;
-}
-
-
-/* canto inferior direito */
-.consulta-usuario .tabela-consulta .corner {
-    -fx-background-color: transparent;
-}
 
 /* =========================================================
-   TABELA - EDITAR / CONSULTAR USUÁRIO
+   BARRA VERTICAL
    ========================================================= */
 
-.editar-usuario .tabela-consulta,
-.consulta-usuario .tabela-consulta {
+.tela-prototipo .tabela-consulta .scroll-bar:vertical {
+
     -fx-background-color: transparent;
-    -fx-border-color: rgba(197,160,89,0.35);
-    -fx-border-width: 1px;
-    -fx-border-radius: 4px;
-    -fx-background-radius: 4px;
-}
 
-.editar-usuario .tabela-consulta .column-header-background,
-.consulta-usuario .tabela-consulta .column-header-background {
-    -fx-background-color: rgba(45,55,72,0.95);
-}
-
-.editar-usuario .tabela-consulta .column-header,
-.editar-usuario .tabela-consulta .filler,
-.consulta-usuario .tabela-consulta .column-header,
-.consulta-usuario .tabela-consulta .filler {
-    -fx-background-color: rgba(45,55,72,0.95);
-    -fx-border-color: transparent rgba(197,160,89,0.25) rgba(197,160,89,0.25) transparent;
-}
-
-.editar-usuario .tabela-consulta .column-header .label,
-.consulta-usuario .tabela-consulta .column-header .label {
-    -fx-text-fill: -fx-gold;
-    -fx-font-size: 11px;
-    -fx-font-weight: bold;
-    -fx-alignment: CENTER_LEFT;
-    -fx-padding: 6px 4px;
-}
-
-.editar-usuario .tabela-consulta .table-row-cell,
-.consulta-usuario .tabela-consulta .table-row-cell {
-    -fx-background-color: rgba(45,55,72,0.88);
-    -fx-border-color: transparent transparent rgba(240,244,248,0.08) transparent;
-    -fx-cell-size: 42px;
-}
-
-.editar-usuario .tabela-consulta .table-row-cell:odd,
-.consulta-usuario .tabela-consulta .table-row-cell:odd {
-    -fx-background-color: rgba(20,37,77,0.88);
-}
-
-.editar-usuario .tabela-consulta .table-row-cell:selected,
-.consulta-usuario .tabela-consulta .table-row-cell:selected {
-    -fx-background-color: rgba(74,85,104,0.95);
-}
-
-.editar-usuario .tabela-consulta .table-cell,
-.consulta-usuario .tabela-consulta .table-cell {
-    -fx-text-fill: -fx-claro;
-    -fx-font-size: 12px;
-    -fx-alignment: CENTER_LEFT;
-    -fx-padding: 6px 10px;
-    -fx-border-color: transparent;
-}
-
-/* botão da coluna ações */
-.editar-usuario .botao-acao-consulta,
-.consulta-usuario .botao-acao-consulta {
-    -fx-background-color: transparent;
-    -fx-background-insets: 0;
-    -fx-background-radius: 0;
-    -fx-border-color: transparent;
-    -fx-text-fill: -fx-gold;
-    -fx-font-size: 15px;
-    -fx-padding: 0;
-    -fx-min-width: 25px;
-    -fx-pref-width: 25px;
-    -fx-max-width: 25px;
-    -fx-min-height: 25px;
-    -fx-pref-height: 25px;
-    -fx-max-height: 25px;
-    -fx-cursor: hand;
-}
-
-.editar-usuario .botao-acao-consulta:hover,
-.consulta-usuario .botao-acao-consulta:hover {
-    -fx-background-color: rgba(197,160,89,0.15);
-    -fx-background-radius: 50%;
-}
-
-.editar-usuario .botao-acao-consulta:focused,
-.consulta-usuario .botao-acao-consulta:focused {
-    -fx-border-color: transparent;
-}
-
-/* some com barra horizontal */
-.editar-usuario .tabela-consulta .scroll-bar:horizontal,
-.consulta-usuario .tabela-consulta .scroll-bar:horizontal {
-    -fx-pref-height: 0;
-    -fx-max-height: 0;
-    -fx-opacity: 0;
-}
-
-.editar-usuario .tabela-consulta .scroll-bar:vertical,
-.consulta-usuario .tabela-consulta .scroll-bar:vertical {
-    -fx-background-color: transparent;
     -fx-pref-width: 8px;
 }
 
-.editar-usuario .tabela-consulta .scroll-bar:vertical .thumb,
-.consulta-usuario .tabela-consulta .scroll-bar:vertical .thumb {
+
+.tela-prototipo .tabela-consulta .scroll-bar:vertical .track {
+
+    -fx-background-color: transparent;
+}
+
+
+.tela-prototipo .tabela-consulta .scroll-bar:vertical .thumb {
+
     -fx-background-color: rgba(197,160,89,0.35);
+
     -fx-background-radius: 10px;
+}
+
+
+.tela-prototipo .tabela-consulta .scroll-bar:vertical .thumb:hover {
+
+    -fx-background-color: rgba(197,160,89,0.60);
+}
+
+
+.tela-prototipo .tabela-consulta .scroll-bar .increment-button,
+.tela-prototipo .tabela-consulta .scroll-bar .decrement-button {
+
+    -fx-background-color: transparent;
+
+    -fx-padding: 0;
+}
+
+
+/* canto inferior */
+
+.tela-prototipo .tabela-consulta .corner {
+
+    -fx-background-color: transparent;
 }

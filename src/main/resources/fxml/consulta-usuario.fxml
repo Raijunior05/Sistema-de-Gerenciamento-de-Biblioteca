@@ -51,81 +51,79 @@
     <center>
 
         <VBox fx:id="painelConsulta"
-              styleClass="painel,consulta-painel"
-              spacing="16"
-              prefWidth="760"
-              maxWidth="760"
-              alignment="TOP_CENTER">
+      styleClass="painel,consulta-painel"
+      spacing="16"
+      prefWidth="760"
+      maxWidth="760"
+      alignment="TOP_CENTER">
 
-            <BorderPane.margin>
-                <Insets top="60"
-                        right="80"
-                        bottom="60"
-                        left="80"/>
-            </BorderPane.margin>
+    <Label text="C O N S U L T A R   U S U Á R I O"
+           styleClass="titulo-tela"
+           alignment="CENTER"/>
 
+    <VBox fx:id="areaBusca"
+          spacing="5"
+          maxWidth="700">
 
-            <!-- TÍTULO -->
-            <Label text="C O N S U L T A R   U S U Á R I O"
-                   styleClass="titulo-tela"
-                   alignment="CENTER"/>
+        <Label text="Nome:"
+               styleClass="rotulo-campo"/>
 
+        <HBox alignment="CENTER"
+              spacing="0"
+              styleClass="caixa-pesquisa">
 
-            <!-- ÁREA DA BUSCA -->
-            <VBox fx:id="areaBusca"
-                  spacing="5"
-                  maxWidth="700">
+            <TextField fx:id="campoNome"
+                       styleClass="campo-busca"
+                       onAction="#onPesquisar"
+                       HBox.hgrow="ALWAYS"/>
 
-                <Label text="Nome:"
-                       styleClass="rotulo-campo"/>
+            <Button text="⌕"
+                    styleClass="botao-busca"
+                    onAction="#onPesquisar"
+                    prefWidth="45"/>
 
-                <HBox alignment="CENTER"
-                      spacing="0"
-                      styleClass="caixa-pesquisa">
+        </HBox>
 
-                    <TextField fx:id="campoNome"
-                               promptText=""
-                               styleClass="campo-busca"
-                               onAction="#onPesquisar"
-                               HBox.hgrow="ALWAYS"/>
+    </VBox>
 
-                    <Button text="⌕"
-                            styleClass="botao-busca"
-                            onAction="#onPesquisar"
-                            prefWidth="45"/>
+    <!-- TABELA PADRÃO -->
+    <TableView fx:id="tabelaUsuarios"
+               visible="false"
+               managed="false"
+               prefHeight="290"
+               maxHeight="290"
+               prefWidth="700"
+               maxWidth="700"
+               styleClass="tabela-consulta">
 
-                </HBox>
+        <columns>
 
-            </VBox>
+            <TableColumn fx:id="colunaMatricula"
+                         text="MATRÍCULA"
+                         prefWidth="180"
+                         minWidth="180"
+                         maxWidth="180"
+                         sortable="false"/>
 
+            <TableColumn fx:id="colunaUsuario"
+                         text="USUÁRIO"
+                         prefWidth="400"
+                         minWidth="400"
+                         maxWidth="400"
+                         sortable="false"/>
 
-            <!-- TABELA - COMEÇA ESCONDIDA -->
-            <TableView fx:id="tabelaUsuarios"
-                       visible="false"
-                       managed="false"
-                       prefHeight="290"
-                       maxWidth="700"
-                       styleClass="tabela-consulta">
+            <TableColumn fx:id="colunaAcoes"
+                         text="AÇÕES"
+                         prefWidth="120"
+                         minWidth="120"
+                         maxWidth="120"
+                         sortable="false"/>
 
-                <columns>
+        </columns>
 
-                    <TableColumn fx:id="colunaMatricula"
-                                 text="MATRÍCULA"
-                                 prefWidth="180"/>
+    </TableView>
 
-                    <TableColumn fx:id="colunaUsuario"
-                                 text="USUÁRIO"
-                                 prefWidth="400"/>
-
-                    <TableColumn fx:id="colunaAcoes"
-                                 text="AÇÕES"
-                                 prefWidth="120"/>
-
-                </columns>
-
-            </TableView>
-
-        </VBox>
+</VBox>
 
     </center>
 

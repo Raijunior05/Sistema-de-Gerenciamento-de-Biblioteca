@@ -30,16 +30,16 @@ private void onConsultarUsuario() {
 }
 @FXML
 private void onEditarUsuario() {
-
-    Navegador.irPara(
-            Navegador.Tela.EDITAR_USUARIO
-    );
+    Navegador.irPara(Navegador.Tela.EDITAR_USUARIO);
 }
 
-    @FXML
-    private void onExcluirUsuario() {
-        Alertas.aviso("Em desenvolvimento", "A tela de exclusão de usuários será aberta aqui.");
-    }
+   @FXML
+private void onExcluirUsuario() {
+
+    Navegador.irPara(
+            Navegador.Tela.EXCLUIR_USUARIO
+    );
+}
 
     @FXML
     private void onVoltar() {

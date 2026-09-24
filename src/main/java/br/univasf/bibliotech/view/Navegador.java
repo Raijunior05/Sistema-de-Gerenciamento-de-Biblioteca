@@ -23,6 +23,7 @@ public final class Navegador {
         DEVOLUCAO("/fxml/devolucao.fxml", "BiblioTech - Realizar devolucao"),
         RESERVA("/fxml/reserva.fxml", "BiblioTech - Realizar reserva"),
         EDITAR_USUARIO("/fxml/editar-usuario.fxml","BiblioTech - Editar usuario"),      
+        EXCLUIR_USUARIO("/fxml/excluir-usuario.fxml","BiblioTech - Excluir usuario"),
         RELATORIO("/fxml/relatorio.fxml", "BiblioTech - Relatorios");
 
         private final String caminho;
