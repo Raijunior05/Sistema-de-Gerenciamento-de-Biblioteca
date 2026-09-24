@@ -549,7 +549,19 @@
     -fx-min-height: 150px;
 }
 
+.acervo-scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+}
 
+.acervo-scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.acervo-scroll-pane > .corner {
+    -fx-background-color: transparent;
+}
 /* Título */
 
 .consulta-usuario .titulo-tela {
