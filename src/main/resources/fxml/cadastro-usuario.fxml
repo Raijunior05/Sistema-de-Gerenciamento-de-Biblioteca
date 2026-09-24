@@ -20,7 +20,7 @@
 
     <!-- Painel de Formulário (Esquerda) -->
     <AnchorPane styleClass="painel,login-painel" prefWidth="380" minWidth="380"
-                prefHeight="520" minHeight="520" maxHeight="520">
+                prefHeight="570" minHeight="570" maxHeight="570">
 
         <!-- Título dinâmico -->
         <Label fx:id="tituloTela" text="C A D A S T R O" styleClass="titulo-tela"
@@ -50,7 +50,7 @@
         <ComboBox fx:id="comboPerfil" layoutX="18" layoutY="270" prefWidth="344"/>
 
         <!-- Campos de credenciais exclusivos para Administrador (sem RadioButton redundante) -->
-        <VBox fx:id="areaAdmin" layoutX="18" layoutY="312" prefWidth="344" spacing="6"
+        <VBox fx:id="areaAdmin" layoutX="18" layoutY="334" prefWidth="344" spacing="8"
               visible="false" managed="false">
             <TextField fx:id="campoLogin" promptText="Login (Nome de usuário)" prefWidth="344"/>
             <HBox spacing="8">
@@ -61,13 +61,13 @@
 
         <!-- Mensagem de erro/duplicidade -->
         <Label fx:id="mensagemErro" styleClass="mensagem-erro" wrapText="true"
-               layoutX="18" layoutY="420" prefWidth="344" prefHeight="30"/>
+               layoutX="18" layoutY="468" prefWidth="344" prefHeight="30"/>
 
         <!-- Botões Cancelar e Concluído -->
         <Button text="Cancelar" styleClass="botao-menu" onAction="#onCancelar"
-                layoutX="18" layoutY="456" prefWidth="155" prefHeight="46"/>
+                layoutX="18" layoutY="506" prefWidth="155" prefHeight="46"/>
         <Button fx:id="botaoSalvar" text="Concluído" styleClass="botao-primario"
-                onAction="#onSalvar" layoutX="207" layoutY="456" prefWidth="155"
+                onAction="#onSalvar" layoutX="207" layoutY="506" prefWidth="155"
                 prefHeight="46" defaultButton="true"/>
     </AnchorPane>
 
