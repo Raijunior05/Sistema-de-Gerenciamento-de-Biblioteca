@@ -9,186 +9,124 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleGroup?>
-
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
-
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-
 <BorderPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="br.univasf.bibliotech.view.EditarUsuarioController"
-            styleClass="tela-prototipo,inicial,editar-usuario">
-
-
-    <!-- =====================================================
-         CABEÇALHO
-         ===================================================== -->
-
+            styleClass="tela-prototipo,inicial,consulta-usuario,editar-usuario">
     <top>
-
         <HBox styleClass="cabecalho"
               alignment="CENTER_LEFT"
               spacing="12">
 
             <VBox alignment="CENTER_LEFT">
-
                 <Label text="S G B"
                        styleClass="marca-sgb,marca-pequena"/>
 
                 <Label text="Sistema de Gerenciamento de Bibliotecas"
                        styleClass="marca-legenda,legenda-pequena"/>
-
             </VBox>
-
 
             <ImageView fitWidth="36"
                        fitHeight="25"
                        preserveRatio="true">
-
                 <image>
                     <Image url="@../images/livros.png"/>
                 </image>
-
             </ImageView>
 
-
             <Region HBox.hgrow="ALWAYS"/>
-
         </HBox>
-
     </top>
 
-
-    <!-- =====================================================
-         CENTRO
-         ===================================================== -->
-
     <center>
-
         <StackPane>
 
-
-            <!-- =================================================
-                 TELA 1 - PESQUISAR / SELECIONAR USUÁRIO
-                 ================================================= -->
-
+            <!-- Tela de pesquisa -->
             <VBox fx:id="areaBusca"
-                  styleClass="painel,editar-busca-painel"
-                  alignment="TOP_CENTER"
-                  spacing="18"
+                  styleClass="painel,consulta-painel"
+                  spacing="16"
                   prefWidth="760"
                   maxWidth="760"
-                  prefHeight="400"
-                  maxHeight="400">
-
+                  alignment="TOP_CENTER">
 
                 <Label text="E D I T A R   U S U Á R I O"
-                       styleClass="titulo-tela"/>
+                       styleClass="titulo-tela"
+                       alignment="CENTER"/>
 
-
-                <VBox spacing="8"
-                      maxWidth="700">
-
-
-                    <!-- CAMPO DE BUSCA -->
-
+                <VBox spacing="5" maxWidth="700">
                     <Label text="Nome:"
                            styleClass="rotulo-campo"/>
 
-
-                    <HBox styleClass="caixa-pesquisa"
-                          alignment="CENTER">
-
+                    <HBox alignment="CENTER"
+                          spacing="0"
+                          styleClass="caixa-pesquisa">
 
                         <TextField fx:id="campoBusca"
-                                   promptText=""
+                                   styleClass="campo-busca"
                                    onAction="#onPesquisar"
-                                   HBox.hgrow="ALWAYS"
-                                   styleClass="campo-busca"/>
-
+                                   HBox.hgrow="ALWAYS"/>
 
                         <Button text="⌕"
-                                onAction="#onPesquisar"
                                 styleClass="botao-busca"
-                                prefWidth="50"/>
-
+                                onAction="#onPesquisar"
+                                prefWidth="45"/>
                     </HBox>
-
-
-                    <!-- =========================================
-                         TABELA DOS USUÁRIOS
-                         ========================================= -->
-
-                    <TableView fx:id="tabelaUsuarios"
-                               visible="false"
-                               managed="false"
-                               prefHeight="230"
-                               maxWidth="700"
-                               styleClass="tabela-consulta">
-
-
-                        <columns>
-
-
-                            <!-- MATRÍCULA / CPF -->
-
-                            <TableColumn fx:id="colunaMatricula"
-                                         text="MATRÍCULA"
-                                         prefWidth="180"
-                                         sortable="false"/>
-
-
-                            <!-- NOME DO USUÁRIO -->
-
-                            <TableColumn fx:id="colunaUsuario"
-                                         text="USUÁRIO"
-                                         prefWidth="400"
-                                         sortable="false"/>
-
-
-                            <!-- BOTÃO PARA EDITAR -->
-
-                            <TableColumn fx:id="colunaAcoes"
-                                         text="AÇÕES"
-                                         prefWidth="100"
-                                         sortable="false"/>
-
-
-                        </columns>
-
-                    </TableView>
-
                 </VBox>
+
+                <TableView fx:id="tabelaUsuarios"
+                           visible="false"
+                           managed="false"
+                           prefHeight="290"
+                           maxHeight="290"
+                           prefWidth="700"
+                           maxWidth="700"
+                           styleClass="tabela-consulta">
+
+                    <columns>
+                        <TableColumn fx:id="colunaMatricula"
+                                     text="MATRÍCULA"
+                                     prefWidth="180"
+                                     minWidth="180"
+                                     maxWidth="180"
+                                     sortable="false"/>
+
+                        <TableColumn fx:id="colunaUsuario"
+                                     text="USUÁRIO"
+                                     prefWidth="400"
+                                     minWidth="400"
+                                     maxWidth="400"
+                                     sortable="false"/>
+
+                        <TableColumn fx:id="colunaAcoes"
+                                     text="AÇÕES"
+                                     prefWidth="120"
+                                     minWidth="120"
+                                     maxWidth="120"
+                                     sortable="false"/>
+                    </columns>
+                </TableView>
 
             </VBox>
 
-
-            <!-- =================================================
-                 TELA 2 - FORMULÁRIO DE EDIÇÃO
-                 ================================================= -->
-
+            <!-- Formulário de edição -->
             <HBox fx:id="areaFormulario"
                   visible="false"
                   managed="false"
                   alignment="CENTER"
                   spacing="50">
 
-
-                <!-- =============================================
-                     FORMULÁRIO
-                     ============================================= -->
-
                 <VBox styleClass="painel,editar-formulario"
                       spacing="8"
                       prefWidth="360"
                       maxWidth="360">
-
 
                     <Label fx:id="tituloFormulario"
                            text="EDITAR USUÁRIO"
@@ -196,126 +134,77 @@
                            maxWidth="Infinity"
                            alignment="CENTER"/>
 
-
-                    <!-- NOME -->
-
-                    <Label text="Nome:"
-                           styleClass="rotulo-campo"/>
-
+                    <Label text="Nome:" styleClass="rotulo-campo"/>
                     <TextField fx:id="campoNome"/>
 
-
-                    <!-- EMAIL -->
-
-                    <Label text="E-mail:"
-                           styleClass="rotulo-campo"/>
-
+                    <Label text="E-mail:" styleClass="rotulo-campo"/>
                     <TextField fx:id="campoEmail"/>
-
-
-                    <!-- CPF / MATRÍCULA -->
 
                     <Label text="CPF ou Matrícula:"
                            styleClass="rotulo-campo"/>
 
-
                     <fx:define>
-
                         <ToggleGroup fx:id="grupoDocumento"/>
-
                     </fx:define>
 
-
-                    <HBox spacing="8"
-                          alignment="CENTER_LEFT">
-
-
+                    <HBox spacing="8" alignment="CENTER_LEFT">
                         <RadioButton fx:id="radioCpf"
                                      text="CPF"
                                      toggleGroup="$grupoDocumento"
                                      selected="true"/>
 
-
                         <RadioButton fx:id="radioMatricula"
                                      text="Matrícula"
                                      toggleGroup="$grupoDocumento"/>
 
-
                         <TextField fx:id="campoDocumento"
                                    HBox.hgrow="ALWAYS"/>
-
                     </HBox>
-
-
-                    <!-- PERFIL -->
 
                     <Label text="Perfil de acesso:"
                            styleClass="rotulo-campo"/>
 
-
                     <ComboBox fx:id="comboPerfil"
                               maxWidth="Infinity"/>
 
-
-                    <!-- =========================================
-                         CAMPOS DE ADMINISTRADOR
-                         ========================================= -->
-
+                    <!-- Campos exibidos para administrador -->
                     <VBox fx:id="areaAdmin"
                           visible="false"
                           managed="false"
                           spacing="6">
 
-
                         <Label text="Usuário:"
                                styleClass="rotulo-campo"/>
-
 
                         <TextField fx:id="campoLogin"
                                    promptText="Nome de usuário"/>
 
-
                         <Label text="Nova senha:"
                                styleClass="rotulo-campo"/>
-
 
                         <PasswordField fx:id="campoSenha"
                                        promptText="Deixe vazio para manter a senha"/>
 
-
                         <Label text="Confirmar senha:"
                                styleClass="rotulo-campo"/>
 
-
                         <PasswordField fx:id="campoConfirmaSenha"
                                        promptText="Confirme a nova senha"/>
-
                     </VBox>
-
-
-                    <!-- ERRO -->
 
                     <Label fx:id="mensagemErro"
                            styleClass="mensagem-erro"
                            wrapText="true"
                            maxWidth="Infinity"/>
 
-
                     <Region prefHeight="5"/>
 
-
-                    <!-- BOTÕES -->
-
-                    <HBox spacing="20"
-                          alignment="CENTER">
-
-
+                    <HBox spacing="20" alignment="CENTER">
                         <Button text="Cancelar"
                                 styleClass="botao-menu"
                                 onAction="#onCancelar"
                                 prefWidth="145"
                                 prefHeight="42"/>
-
 
                         <Button fx:id="botaoSalvar"
                                 text="Concluído"
@@ -324,85 +213,55 @@
                                 prefWidth="145"
                                 prefHeight="42"
                                 defaultButton="true"/>
-
                     </HBox>
-
                 </VBox>
-
-
-                <!-- =============================================
-                     LOGO / LIVROS
-                     ============================================= -->
 
                 <VBox alignment="TOP_CENTER"
                       spacing="4"
                       prefWidth="380">
 
-
                     <Label text="S G B"
                            styleClass="marca-sgb,login-marca"/>
-
 
                     <Label text="Sistema de Gerenciamento de Bibliotecas"
                            styleClass="marca-legenda"/>
 
-
                     <Region prefHeight="40"/>
-
 
                     <ImageView fitWidth="430"
                                fitHeight="300"
                                preserveRatio="true">
-
                         <image>
                             <Image url="@../images/livros.png"/>
                         </image>
-
                     </ImageView>
-
                 </VBox>
 
             </HBox>
 
         </StackPane>
-
     </center>
 
-
-    <!-- =====================================================
-         RODAPÉ
-         ===================================================== -->
-
     <bottom>
-
         <HBox styleClass="rodape"
               alignment="CENTER_LEFT"
               spacing="16">
 
-
             <StackPane styleClass="perfil-circulo">
-
-
                 <ImageView fitWidth="20"
                            fitHeight="20"
                            preserveRatio="true">
-
                     <image>
                         <Image url="@../images/perfil.png"/>
                     </image>
-
                 </ImageView>
-
             </StackPane>
-
 
             <Label fx:id="rodapeNome"
                    text="Administrador"
                    styleClass="rodape-usuario"/>
 
-
             <Region HBox.hgrow="ALWAYS"/>
-
 
             <Button text="Voltar"
                     styleClass="botao-primario"
@@ -410,33 +269,22 @@
                     prefWidth="140"
                     prefHeight="40"/>
 
-
             <Region HBox.hgrow="ALWAYS"/>
-
 
             <Button styleClass="botao-sair"
                     onAction="#onSair"
                     accessibleText="Sair do sistema">
-
-
                 <graphic>
-
                     <ImageView fitWidth="16"
                                fitHeight="16"
                                preserveRatio="true">
-
                         <image>
                             <Image url="@../images/sair.png"/>
                         </image>
-
                     </ImageView>
-
                 </graphic>
-
             </Button>
-
         </HBox>
-
     </bottom>
 
 </BorderPane>
