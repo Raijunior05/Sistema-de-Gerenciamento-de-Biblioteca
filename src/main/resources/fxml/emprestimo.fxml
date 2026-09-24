@@ -72,6 +72,14 @@
         <Label fx:id="mensagemErro" styleClass="mensagem-erro" wrapText="true"
                layoutX="18" layoutY="380" prefWidth="344" prefHeight="36"/>
 
+        <Button text="Item indisponível? Reservar"
+        styleClass="botao-menu"
+        onAction="#onReservarItem"
+        layoutX="18"
+        layoutY="424"
+        prefWidth="344"
+        prefHeight="38"/>
+        
         <!-- Botões Cancelar e Concluído -->
         <Button text="Cancelar" styleClass="botao-menu" onAction="#onCancelar"
                 layoutX="18" layoutY="474" prefWidth="155" prefHeight="46"/>

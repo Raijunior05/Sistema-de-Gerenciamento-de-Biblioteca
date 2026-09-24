@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="br.univasf.bibliotech.view.ReservaController"
+            styleClass="tela-prototipo,inicial,reserva">
+
+    <top>
+        <HBox styleClass="cabecalho" alignment="CENTER_LEFT" spacing="12">
+            <VBox alignment="CENTER_LEFT">
+                <Label text="S G B" styleClass="marca-sgb,marca-pequena"/>
+                <Label text="Sistema de Gerenciamento de Bibliotecas"
+                       styleClass="marca-legenda,legenda-pequena"/>
+            </VBox>
+
+            <ImageView fitWidth="36" fitHeight="25" preserveRatio="true">
+                <image>
+                    <Image url="@../images/livros.png"/>
+                </image>
+            </ImageView>
+        </HBox>
+    </top>
+
+    <center>
+        <StackPane>
+            <BorderPane.margin>
+                <Insets top="10" right="40" bottom="10" left="40"/>
+            </BorderPane.margin>
+
+            <!-- Tela inicial: reservar item -->
+            <VBox fx:id="areaFormulario"
+                  styleClass="painel,reserva-painel,reserva-formulario"
+                  alignment="TOP_CENTER"
+                  spacing="12"
+                  maxWidth="820"
+                  maxHeight="300">
+
+                <Label text="R E S E R V A R   I T E M"
+                       styleClass="titulo-tela"/>
+
+                <VBox spacing="5" maxWidth="730">
+                    <Label text="Título:" styleClass="rotulo-campo"/>
+
+                    <HBox styleClass="caixa-reserva"
+                          spacing="6"
+                          alignment="CENTER_LEFT">
+                        <ComboBox fx:id="comboItem"
+                                  promptText="Selecione um item"
+                                  HBox.hgrow="ALWAYS"
+                                  maxWidth="Infinity"/>
+
+                        <Button fx:id="botaoVerificar"
+                                text="⌕"
+                                accessibleText="Verificar item"
+                                styleClass="botao-lupa-reserva"
+                                onAction="#onVerificarItem"/>
+                    </HBox>
+
+                    <Label fx:id="rotuloDisponibilidade"
+                           styleClass="rotulo-campo"
+                           wrapText="true"/>
+
+                    <Button fx:id="botaoEmprestimo"
+                            text="Ir para empréstimo"
+                            styleClass="botao-menu"
+                            visible="false"
+                            managed="false"
+                            onAction="#onIrParaEmprestimo"/>
+
+                    <Label text="CPF ou Matrícula:"
+                           styleClass="rotulo-campo"/>
+
+                    <HBox spacing="12" alignment="CENTER_LEFT">
+                        <TextField fx:id="campoIdentificacao"
+                                   promptText="CPF ou matrícula"
+                                   disable="true"
+                                   HBox.hgrow="ALWAYS"
+                                   onAction="#onIdentificar"/>
+                    </HBox>
+
+                    <Button fx:id="botaoIdentificar"
+                            text="Identificar usuário"
+                            styleClass="botao-primario"
+                            disable="true"
+                            onAction="#onIdentificar"/>
+
+                    <Label fx:id="rotuloUsuario"
+                           styleClass="rotulo-campo"/>
+
+                    <Label fx:id="mensagemErro"
+                           styleClass="mensagem-erro"
+                           wrapText="true"/>
+                </VBox>
+
+                <Region VBox.vgrow="ALWAYS"/>
+
+                <HBox alignment="CENTER_RIGHT"
+                      spacing="12"
+                      maxWidth="730">
+
+                    <!-- Abre a consulta sem precisar fazer uma reserva -->
+                    <Button text="Consultar reservas"
+                            styleClass="botao-menu"
+                            onAction="#onConsultarReservas"/>
+
+                    <Button fx:id="botaoConfirmar"
+                            text="Reservar item"
+                            styleClass="botao-primario"
+                            disable="true"
+                            onAction="#onConfirmar"/>
+                </HBox>
+            </VBox>
+
+            <!-- Tela de consulta -->
+            <VBox fx:id="areaConsulta"
+      styleClass="painel,reserva-painel,reserva-consulta"
+      alignment="TOP_CENTER"
+      spacing="14"
+      maxWidth="840"
+      prefHeight="420"
+      visible="false"
+      managed="false">
+
+    <Label text="C O N S U L T A R   R E S E R V A S"
+           styleClass="titulo-tela"/>
+
+    <HBox spacing="12" alignment="BOTTOM_LEFT" maxWidth="790">
+        <VBox spacing="4" HBox.hgrow="ALWAYS">
+            <Label text="BUSCA RÁPIDA: OBRA OU LEITOR"
+                   styleClass="rotulo-campo"/>
+            <TextField fx:id="campoBusca"
+                       promptText="Busque pelo nome ou título"
+                       maxWidth="Infinity"
+                       onAction="#onPesquisar"/>
+        </VBox>
+
+        <VBox spacing="4">
+            <Label text="STATUS" styleClass="rotulo-campo"/>
+            <ComboBox fx:id="comboStatus" prefWidth="140"/>
+        </VBox>
+
+        <VBox spacing="4">
+            <Label text="ORDEM DA FILA" styleClass="rotulo-campo"/>
+            <ComboBox fx:id="comboOrdem" prefWidth="140"/>
+        </VBox>
+
+        <Button fx:id="botaoPesquisar"
+                text="⌕"
+                accessibleText="Pesquisar reservas"
+                styleClass="botao-lupa-reserva"
+                onAction="#onPesquisar"/>
+    </HBox>
+
+    <TableView fx:id="tabelaReservas"
+               styleClass="tabela-reservas"
+               prefHeight="250"
+               maxWidth="790"
+               VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colunaPosicao"
+                         text="POSIÇÃO"
+                         prefWidth="75"/>
+            <TableColumn fx:id="colunaLeitor"
+                         text="LEITOR"
+                         prefWidth="105"/>
+            <TableColumn fx:id="colunaObra"
+                         text="OBRA RESERVADA"
+                         prefWidth="210"/>
+            <TableColumn fx:id="colunaData"
+                         text="DATA DA RESERVA"
+                         prefWidth="115"/>
+            <TableColumn fx:id="colunaValidade"
+                         text="VALIDADE MÁXIMA"
+                         prefWidth="115"/>
+            <TableColumn fx:id="colunaStatus"
+                         text="STATUS"
+                         prefWidth="100"/>
+            <TableColumn fx:id="colunaAcoes"
+                         text="AÇÕES"
+                         prefWidth="70"/>
+        </columns>
+    </TableView>
+
+    <Label fx:id="mensagemConsulta"
+           styleClass="mensagem-erro"
+           wrapText="true"/>
+        </VBox>
+        </StackPane>
+    </center>
+
+    <bottom>
+        <HBox styleClass="rodape"
+              alignment="CENTER_LEFT"
+              spacing="16">
+
+            <StackPane styleClass="perfil-circulo">
+                <ImageView fitWidth="20"
+                           fitHeight="20"
+                           preserveRatio="true">
+                    <image>
+                        <Image url="@../images/perfil.png"/>
+                    </image>
+                </ImageView>
+            </StackPane>
+
+            <Label fx:id="rodapeNome"
+                   text="Administrador"
+                   styleClass="rodape-usuario"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <Button text="Voltar"
+                    styleClass="botao-primario"
+                    prefWidth="140"
+                    prefHeight="40"
+                    onAction="#onVoltar"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+        </HBox>
+    </bottom>
+</BorderPane>

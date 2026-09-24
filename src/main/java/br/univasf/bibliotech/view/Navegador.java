@@ -8,6 +8,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 public final class Navegador {
 
@@ -59,6 +60,10 @@ public final class Navegador {
     }
 
     public static void irPara(Tela tela) {
+        irPara(tela, controller -> {});
+    }
+
+    public static void irPara(Tela tela, Consumer<Object> configurarController) {
         try {
 
             var recurso = Navegador.class.getResource(tela.caminho);
@@ -76,6 +81,7 @@ public final class Navegador {
             FXMLLoader loader = new FXMLLoader(recurso);
 
             Parent raiz = loader.load();
+            configurarController.accept(loader.getController());
 
             Scene cena = palco.getScene();
 
