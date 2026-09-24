@@ -4,11 +4,9 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
@@ -75,8 +73,6 @@
 
                     <Label fx:id="rotuloDisponibilidade"
                            styleClass="rotulo-campo"
-                           visible="false"
-                           managed="false"
                            wrapText="true"/>
 
                     <Button fx:id="botaoEmprestimo"
@@ -89,18 +85,7 @@
                     <Label text="CPF ou Matrícula:"
                            styleClass="rotulo-campo"/>
 
-                    <fx:define>
-                        <ToggleGroup fx:id="tipoDocumento"/>
-                    </fx:define>
-
                     <HBox spacing="12" alignment="CENTER_LEFT">
-                        <RadioButton text="CPF"
-                                     toggleGroup="$tipoDocumento"
-                                     selected="true"/>
-
-                        <RadioButton text="Matrícula"
-                                     toggleGroup="$tipoDocumento"/>
-
                         <TextField fx:id="campoIdentificacao"
                                    promptText="CPF ou matrícula"
                                    disable="true"
@@ -115,14 +100,10 @@
                             onAction="#onIdentificar"/>
 
                     <Label fx:id="rotuloUsuario"
-                           styleClass="rotulo-campo"
-                           visible="false"
-                           managed="false"/>
+                           styleClass="rotulo-campo"/>
 
                     <Label fx:id="mensagemErro"
                            styleClass="mensagem-erro"
-                           visible="false"
-                           managed="false"
                            wrapText="true"/>
                 </VBox>
 

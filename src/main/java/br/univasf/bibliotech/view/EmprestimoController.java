@@ -172,6 +172,8 @@ public class EmprestimoController {
 
 @FXML
 private void onReservarItem() {
-    Navegador.irPara(Navegador.Tela.RESERVA);
+    Navegador.irPara(Navegador.Tela.RESERVA, controller ->
+            ((ReservaController) controller).preencherDoEmprestimo(
+                    comboItem.getValue(), usuarioIdentificado, campoDocumento.getText()));
 }
 }

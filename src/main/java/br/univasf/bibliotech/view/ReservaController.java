@@ -55,6 +55,17 @@ public class ReservaController {
 
     private Item itemIndisponivel;
     private Usuario usuarioIdentificado;
+    private Item itemRecebido;
+    private Usuario usuarioRecebido;
+    private String documentoRecebido;
+    private boolean processando;
+
+    public void preencherDoEmprestimo(Item item, Usuario usuario, String documento) {
+        itemRecebido = item;
+        usuarioRecebido = usuario;
+        documentoRecebido = documento;
+        if (documento != null) campoIdentificacao.setText(documento);
+    }
 
     @FXML
     private void initialize() {
@@ -87,6 +98,7 @@ public class ReservaController {
         campoIdentificacao.textProperty().addListener(
                 (obs, anterior, atual) -> {
                     usuarioIdentificado = null;
+                    usuarioRecebido = null;
 
                     rotuloUsuario.setText(
                             "Nenhum usuário identificado"
@@ -128,6 +140,18 @@ public class ReservaController {
                             ? "Nenhum item cadastrado"
                             : "Selecione uma obra"
             );
+            if (itemRecebido != null) {
+                if (comboItem.getItems().stream().noneMatch(item -> item.getId().equals(itemRecebido.getId()))) {
+                    mensagemErro.setText("O item do empréstimo não está mais no acervo.");
+                }
+                comboItem.getItems().stream()
+                        .filter(item -> item.getId().equals(itemRecebido.getId()))
+                        .findFirst().ifPresent(item -> {
+                            comboItem.setValue(item);
+                            onVerificarItem();
+                        });
+                itemRecebido = null;
+            }
         });
 
         tarefa.setOnFailed(evento -> {
@@ -187,6 +211,12 @@ public class ReservaController {
 
             Item itemAtual = tarefa.getValue();
 
+            if (itemAtual == null) {
+                mensagemErro.setText("Item não encontrado no acervo.");
+                atualizarBotoes();
+                return;
+            }
+
             if (itemAtual.getQuantidadeDisponivel() > 0) {
                 // Fluxo alternativo 3.1
                 rotuloDisponibilidade.setText(
@@ -206,6 +236,15 @@ public class ReservaController {
 
                 botaoEmprestimo.setVisible(false);
                 botaoEmprestimo.setManaged(false);
+                if (usuarioRecebido != null) {
+                    usuarioIdentificado = usuarioRecebido;
+                    rotuloUsuario.setText("Usuário: " + usuarioRecebido.getNome());
+                    usuarioRecebido = null;
+                } else if (documentoRecebido != null && !documentoRecebido.isBlank()) {
+                    documentoRecebido = null;
+                    onIdentificar();
+                    return;
+                }
             }
 
             atualizarBotoes();
@@ -311,15 +350,15 @@ public class ReservaController {
                 itemIndisponivel != null;
 
         campoIdentificacao.setDisable(
-                !itemVerificado
+                !itemVerificado || processando
         );
 
         botaoIdentificar.setDisable(
-                !itemVerificado
+                !itemVerificado || processando
         );
 
         botaoConfirmar.setDisable(
-                !itemVerificado
+                processando || !itemVerificado
                         || usuarioIdentificado == null
         );
     }
@@ -353,6 +392,7 @@ public class ReservaController {
                 Sessao.getAdministrador();
 
         mensagemErro.setText("");
+        processando = true;
 
         botaoConfirmar.setDisable(true);
         botaoIdentificar.setDisable(true);
@@ -376,6 +416,7 @@ public class ReservaController {
         };
 
         tarefa.setOnSucceeded(evento -> {
+            processando = false;
             Reserva reserva = tarefa.getValue();
 
             Alertas.sucesso(
@@ -393,6 +434,7 @@ public class ReservaController {
         });
 
         tarefa.setOnFailed(evento -> {
+            processando = false;
             comboItem.setDisable(false);
             botaoVerificar.setDisable(false);
 
@@ -403,11 +445,11 @@ public class ReservaController {
                 // mostra a mensagem retornada pelo serviço.
                 mensagemErro.setText(causa.getMessage());
 
-                itemIndisponivel = null;
-
-                rotuloDisponibilidade.setText(
-                        "Verifique novamente a disponibilidade do item."
-                );
+                if (causa.getMessage() != null
+                        && causa.getMessage().startsWith("O item possui exemplar")) {
+                    itemIndisponivel = null;
+                    rotuloDisponibilidade.setText("A disponibilidade mudou. Verifique o item novamente.");
+                }
 
                 atualizarBotoes();
             } else {
