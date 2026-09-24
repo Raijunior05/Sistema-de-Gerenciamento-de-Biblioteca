@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="br.univasf.bibliotech.view.DevolucaoController"
+            styleClass="tela-prototipo,inicial,devolucao">
+
+    <top>
+        <HBox styleClass="cabecalho"
+              alignment="CENTER_LEFT"
+              spacing="12">
+
+            <VBox alignment="CENTER_LEFT">
+                <Label text="S G B"
+                       styleClass="marca-sgb,marca-pequena"/>
+
+                <Label text="Sistema de Gerenciamento de Bibliotecas"
+                       styleClass="marca-legenda,legenda-pequena"/>
+            </VBox>
+
+            <ImageView fitWidth="36"
+                       fitHeight="25"
+                       preserveRatio="true">
+                <image>
+                    <Image url="@../images/livros.png"/>
+                </image>
+            </ImageView>
+        </HBox>
+    </top>
+
+    <center>
+        <StackPane>
+            <BorderPane.margin>
+                <Insets top="10"
+                        right="40"
+                        bottom="10"
+                        left="40"/>
+            </BorderPane.margin>
+
+            <!-- Etapa 1: identificar usuário -->
+            <VBox fx:id="areaIdentificacao"
+                  styleClass="painel,devolucao-painel,devolucao-identificacao"
+                  alignment="TOP_CENTER"
+                  spacing="18"
+                  maxWidth="820"
+                  maxHeight="230">
+
+                <Label text="R E A L I Z A R   D E V O L U Ç Ã O"
+                       styleClass="titulo-tela"/>
+
+                <VBox spacing="8" maxWidth="530">
+                    <Label text="Identificação do usuário:"
+                           styleClass="rotulo-campo"/>
+
+                    <Label text="CPF ou matrícula:"
+                           styleClass="rotulo-campo"/>
+
+                    <TextField fx:id="campoIdentificacao"
+                               promptText="Digite o CPF ou a matrícula"
+                               onAction="#onIdentificar"/>
+
+                    <Label fx:id="mensagemErro"
+                           styleClass="mensagem-erro"
+                           wrapText="true"/>
+                </VBox>
+
+                <Button fx:id="botaoIdentificar"
+                        text="Identificar usuário"
+                        styleClass="botao-primario"
+                        onAction="#onIdentificar"/>
+            </VBox>
+
+            <!-- Etapa 2: consultar empréstimos -->
+            <VBox fx:id="areaEmprestimos"
+                  styleClass="painel,devolucao-painel,devolucao-lista"
+                  alignment="TOP_CENTER"
+                  spacing="12"
+                  maxWidth="840"
+                  visible="false"
+                  managed="false">
+
+                <Label text="C O N S U L T A R   E M P R É S T I M O S"
+                       styleClass="titulo-tela"/>
+
+                <Label fx:id="rotuloUsuario"
+                       text="Nenhum usuário identificado"
+                       styleClass="rotulo-campo"/>
+
+                <TableView fx:id="tabelaEmprestimos"
+                           styleClass="tabela-devolucao"
+                           prefHeight="260"
+                           VBox.vgrow="ALWAYS">
+
+                    <columns>
+                        <TableColumn fx:id="colunaCodigo"
+                                     text="CÓDIGO"
+                                     prefWidth="95"/>
+
+                        <TableColumn fx:id="colunaLeitor"
+                                     text="LEITOR"
+                                     prefWidth="115"/>
+
+                        <TableColumn fx:id="colunaTitulo"
+                                     text="LIVRO / OBRA"
+                                     prefWidth="205"/>
+
+                        <TableColumn fx:id="colunaRetirada"
+                                     text="RETIRADA"
+                                     prefWidth="105"/>
+
+                        <TableColumn fx:id="colunaPrazo"
+                                     text="DEVOLUÇÃO"
+                                     prefWidth="105"/>
+
+                        <TableColumn fx:id="colunaStatus"
+                                     text="STATUS"
+                                     prefWidth="95"/>
+
+                        <TableColumn fx:id="colunaAcoes"
+                                     text="AÇÕES"
+                                     prefWidth="70"/>
+                    </columns>
+                </TableView>
+
+                <VBox fx:id="areaDetalhes"
+                      alignment="CENTER_LEFT"
+                      spacing="8"
+                      visible="false"
+                      managed="false">
+
+                    <HBox spacing="22">
+                        <Label fx:id="rotuloPrazo"
+                               text="Prazo: —"
+                               styleClass="rotulo-campo"/>
+
+                        <Label fx:id="rotuloAtraso"
+                               text="Atraso: —"
+                               styleClass="rotulo-campo"/>
+                    </HBox>
+
+                    <Button fx:id="botaoConfirmar"
+                            text="Confirmar devolução"
+                            styleClass="botao-primario"
+                            disable="true"
+                            onAction="#onConfirmar"/>
+                </VBox>
+
+                <Label fx:id="mensagemErroTabela"
+                       styleClass="mensagem-erro"
+                       wrapText="true"/>
+            </VBox>
+        </StackPane>
+    </center>
+
+    <bottom>
+        <HBox styleClass="rodape"
+              alignment="CENTER_LEFT"
+              spacing="16">
+
+            <StackPane styleClass="perfil-circulo">
+                <ImageView fitWidth="20"
+                           fitHeight="20"
+                           preserveRatio="true">
+                    <image>
+                        <Image url="@../images/perfil.png"/>
+                    </image>
+                </ImageView>
+            </StackPane>
+
+            <Label fx:id="rodapeNome"
+                   text="Administrador"
+                   styleClass="rodape-usuario"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <Button text="Voltar"
+                    styleClass="botao-primario"
+                    onAction="#onVoltar"
+                    prefWidth="140"
+                    prefHeight="40"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>

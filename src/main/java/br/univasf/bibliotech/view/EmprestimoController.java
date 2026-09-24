@@ -169,4 +169,9 @@ public class EmprestimoController {
     private void onCancelar() {
         Navegador.irPara(Navegador.Tela.VISAO_GERAL);
     }
+
+@FXML
+private void onReservarItem() {
+    Navegador.irPara(Navegador.Tela.RESERVA);
+}
 }
