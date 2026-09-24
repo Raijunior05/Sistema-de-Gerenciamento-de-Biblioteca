@@ -33,9 +33,12 @@ public class EmprestimoDAOPostgres implements EmprestimoDAO {
                    i.tombo AS i_tombo, i.quantidade_disp AS i_disp,
                    i.quantidade_total AS i_total
               FROM emprestimo e
-              JOIN usuario u ON u.id = e.usuario_id
-              JOIN item    i ON i.id = e.item_id
+              LEFT JOIN usuario u ON u.id = e.usuario_id
+              JOIN item         i ON i.id = e.item_id
             """;
+
+    /** CU 5: historico de usuario removido permanece sem o vinculo (migration V5). */
+    static final String USUARIO_EXCLUIDO = "(usuário excluído)";
 
     private final DataSource dataSource;
 
@@ -278,8 +281,8 @@ public class EmprestimoDAOPostgres implements EmprestimoDAO {
         e.setDiasAtraso(rs.getInt("dias_atraso"));
 
         var u = new br.univasf.bibliotech.model.Usuario();
-        u.setId(rs.getLong("u_id"));
-        u.setNome(rs.getString("u_nome"));
+        u.setId(rs.getObject("u_id", Long.class));
+        u.setNome(u.getId() == null ? USUARIO_EXCLUIDO : rs.getString("u_nome"));
         u.setEmail(rs.getString("u_email"));
         u.setCpf(rs.getString("u_cpf"));
         u.setMatricula(rs.getString("u_matricula"));

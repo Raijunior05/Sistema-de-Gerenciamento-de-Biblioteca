@@ -121,18 +121,133 @@ reinicie a aplicação para carregar os novos valores:
 
 ---
 
-## Dados de demonstração
+## Dados de demonstração (seed)
 
-Para a apresentação, ative o seed renomeando o arquivo:
+O seed preenche o banco com um cenário pronto para apresentar todos os casos
+de uso: usuários, acervo, empréstimos em dia, atrasados e devolvidos, e reservas
+em fila. Ele **não roda sozinho**: não é migration do Flyway nem é usado pelos
+testes. Você executa quando quiser, e pode repetir a execução.
+
+| Arquivo | Função |
+| --- | --- |
+| `scripts/seed-demo.sql` | o script SQL com todos os dados |
+| `scripts/seed-demo.ps1` | atalho para Windows (PowerShell) |
+| `scripts/seed-demo.sh` | atalho para Linux/macOS |
+
+### Passo a passo (banco em Docker)
+
+1. **Suba o banco** e espere o status `healthy`:
+
+   ```bash
+   docker compose up -d
+   docker compose ps
+   ```
+
+2. **Abra a aplicação uma vez** (`mvn clean javafx:run`) e feche-a. É nesse
+   momento que o Flyway cria as tabelas; sem elas o seed é interrompido com a
+   mensagem *"Schema inexistente"*.
+
+3. **Rode o seed** na raiz do projeto:
+
+   ```bash
+   # Windows (PowerShell ou Prompt de Comando)
+   powershell -ExecutionPolicy Bypass -File scripts\seed-demo.ps1
+
+   # Linux/macOS
+   sh scripts/seed-demo.sh
+   ```
+
+   Os atalhos copiam o SQL para dentro do container `bibliotech-db` e o executam
+   com `psql`. Ao final aparece um resumo como este:
+
+   ```
+              dado           | total
+   --------------------------+-------
+    usuarios                 |    11
+    itens                    |    15
+    emprestimos em andamento |     8
+    emprestimos atrasados    |     3
+    emprestimos concluidos   |    10
+    reservas ativas          |     5
+   ```
+
+4. **Abra a aplicação** e entre com `admin@bibliotech.local` / `admin123`
+   ou com o Administrador de demonstração `coordenacao` / `demo123`.
+
+### Passo a passo (PostgreSQL nativo, sem Docker)
+
+Com o banco criado conforme a opção B e a aplicação já aberta uma vez, execute o
+SQL direto com o `psql` instalado junto do PostgreSQL:
 
 ```bash
-mv src/main/resources/db/migration/afterMigrate__seed_demo.sql.disabled \
-   src/main/resources/db/migration/afterMigrate__seed_demo.sql
+psql -h localhost -U bibliotech -d bibliotech -v ON_ERROR_STOP=1 -f scripts/seed-demo.sql
 ```
 
-Ele popula usuários e acervo de exemplo. O seed ainda não cria movimentações
-correspondentes à disponibilidade reduzida dos itens; não o use como evidência
-de consistência de empréstimos ou reservas. Veja `docs/PENDENCIAS.md`.
+No Windows, se os acentos aparecerem trocados, rode `chcp 65001` no terminal
+antes do comando.
+
+### O que é criado
+
+As datas são calculadas a partir do dia em que o seed roda, então o cenário
+sempre parece atual (empréstimos "de 3 dias atrás", "vencidos há 5 dias" etc.).
+Prazo de empréstimo de 15 dias e validade de reserva de 7 dias, os valores
+padrão de `database.properties`.
+
+**Usuários** — use o CPF ou a matrícula nas telas que identificam o usuário (CU 9):
+
+| Usuário | CPF / matrícula | Situação |
+| --- | --- | --- |
+| Carlos Alberto Souza | 321.654.987-01 | 3 empréstimos em aberto: **limite atingido** |
+| Mariana Costa Silva | 321.654.987-02 | 1 empréstimo **atrasado**: pendência |
+| Juliana Reis Mendes | 2023001 | 1 empréstimo em dia |
+| Amanda Siqueira Mendes | 321.654.987-04 | 1 empréstimo em dia; 1ª da fila de O Hobbit |
+| Bruno Oliveira Lopes | 2023002 | 1 empréstimo atrasado; 2º da fila de O Hobbit |
+| Fernanda Rocha Dias | 321.654.987-06 | exemplar de Grande Sertão **separado para ela** |
+| Rafael Gomes Pereira | 2024010 | 1 empréstimo em dia; 2º da fila de Grande Sertão |
+| Patrícia Nunes Araújo | 321.654.987-08 / 2024011 | 1 em dia e 1 atrasado |
+| Gabriela Torres Lima | 321.654.987-09 | só histórico encerrado: **pode ser excluída** |
+| Lucas Martins Ferreira | 2025003 | sem movimentações: **pode ser excluído** |
+
+**Acervo** — 15 itens com tombo `DEM-001` a `DEM-015` (livros, uma revista e
+um DVD). O Hobbit e 1984 estão sem exemplar; Grande Sertão tem 1 exemplar, mas
+reservado para Fernanda.
+
+### Roteiro sugerido para a apresentação
+
+| Caso de uso | O que fazer | Resultado esperado |
+| --- | --- | --- |
+| CU 8 | Pesquisar Acervo com o campo vazio (ou `DEM-` só para a demonstração) | itens com a disponibilidade |
+| CU 10 | Empréstimo de Dom Casmurro para Juliana (2023001) | empréstimo registrado |
+| CU 10, 3.1 | Selecionar O Hobbit no empréstimo | indisponível; oferece reserva |
+| CU 10, 7.1 | Empréstimo para Carlos (321.654.987-01) | recusado: limite atingido |
+| CU 10, 7.1 | Empréstimo para Mariana (321.654.987-02) | recusado: item em atraso |
+| CU 12, 7.1 | Grande Sertão para Rafael (2024010) | recusado: separado para Fernanda |
+| CU 11 | Reservar 1984 para Lucas (2025003) | entra na fila, posição 2 |
+| CU 11, 3.1 | Reservar Dom Casmurro | recusado: item disponível |
+| CU 12 | Devolução de O Hobbit por Mariana | concluída; exemplar separado para Amanda |
+| CU 13 | Relatório de Atrasos, período "Mês atual" | atrasados e devoluções com atraso |
+| CU 5 | Excluir Gabriela; depois tentar excluir Carlos | Gabriela sai; Carlos é bloqueado |
+
+### Restaurar ou remover
+
+- **Restaurar o cenário** depois de uma apresentação: rode o seed de novo. Ele
+  apaga só os dados de demonstração (e-mails `@demo.bibliotech.local`, tombos e
+  códigos `DEM-`, e as movimentações ligadas a eles) e os recria. Cadastros
+  feitos por você com outros dados não são tocados.
+- **Zerar o banco inteiro** (apaga **todos** os dados, inclusive os seus):
+  `docker compose down -v`, depois `docker compose up -d` e abra a aplicação
+  para o Flyway recriar as tabelas.
+
+### Problemas comuns
+
+| Mensagem | Causa e solução |
+| --- | --- |
+| `Schema inexistente: abra a aplicação uma vez...` | as tabelas ainda não existem; abra a aplicação uma vez e rode de novo |
+| `Container bibliotech-db nao encontrado` | o banco não está no ar; rode `docker compose up -d` |
+| `execução de scripts foi desabilitada` (PowerShell) | use o comando exatamente como acima, com `-ExecutionPolicy Bypass` |
+| `duplicate key ... usuario_cpf_key` ou `login` | já existe um cadastro seu com o mesmo CPF ou o login `coordenacao`; altere o seu ou o valor em `seed-demo.sql` |
+
+Em caso de erro, nada é gravado: o script roda em uma única transação.
 
 ---
 
@@ -144,7 +259,7 @@ de consistência de empréstimos ou reservas. Veja `docs/PENDENCIAS.md`.
 
 ## Interface e navegação
 
-- **Login:** painel translúcido arredondado, campos arredondados, marca SGB e
+- **Login:** painel translúcido arredondado, campos arredondados, marca BiblioTech e
   imagem original dos livros, conforme o [Figma SGB](https://www.figma.com/design/7vOy8UHiIwO9NGVkXVkxvu/SGB?node-id=6-21).
   Aceita e-mail ou login; somente Administrador acessa o sistema.
 - **Visão geral:** três indicadores reais e acesso rápido a **Gerar Relatório**,
@@ -153,13 +268,18 @@ de consistência de empréstimos ou reservas. Veja `docs/PENDENCIAS.md`.
   reservas ficam exclusivamente em **Relatórios**.
 - **Rodapé:** nome do administrador, Cadastrar Leitor, Cadastrar Empréstimo e
   sair. O menu do perfil contém somente **Administrar usuários**.
-- **Relatórios:** abas **Consultar Empréstimos** (busca, status e período de
+- **Relatórios:** aba **Gerar Relatório** (CU 13) com os quatro tipos do
+  documento — itens emprestados, itens reservados e disponíveis, atrasos e
+  histórico por usuário —, filtros próprios de cada tipo e atalhos diário,
+  semanal e mensal; abas **Consultar Empréstimos** (busca, status e período de
   retirada) e **Consultar Reservas** (busca, status e ordem de posição na fila).
   Use **Pesquisar** ou Enter na busca; **Limpar filtros** volta à consulta completa.
   Carregamento, ausência de resultados e falhas têm mensagens próprias.
-- Login, visão geral e consultas em Relatórios estão implementados. Os demais
-  destinos ainda exibem aviso de indisponibilidade; veja `docs/PENDENCIAS.md`.
-  Exportação CSV e os demais relatórios do CU 13 continuam pendentes.
+- **Realizar empréstimo:** segue o diagrama do CU 10 — item, verificação de
+  disponibilidade, identificação do usuário e registro. Com item indisponível,
+  a tela oferece a reserva; a data de retirada é a atual e não é editável.
+- Todas as telas dos casos de uso estão implementadas. A exportação CSV
+  continua pendente; veja `docs/PENDENCIAS.md`.
 
 Os recursos visuais e a fonte Montserrat são distribuídos junto da aplicação:
 nenhuma conexão ao Figma ou à internet é feita durante o uso. A janela inicia
@@ -177,7 +297,17 @@ datas e dias de atraso. As migrations anteriores foram mantidas intactas.
 Não é necessário recriar o banco. Remova `regra.valorMultaPorDia` de eventual
 `database.properties` externo; a propriedade deixou de ser utilizada.
 
-Validação: compilação Java 21, 34 testes unitários e 5 testes de integração
-aprovados em PostgreSQL 17 temporário, incluindo instalação limpa e atualização V3 → V4.
-Os três FXML também foram carregados e renderizados com CSS e recursos locais,
-usando serviços simulados. As funcionalidades ainda pendentes estão em `docs/PENDENCIAS.md`.
+## Exclusão de usuário e reservas
+
+A migration V5 permite excluir um usuário que só tem histórico encerrado: os
+empréstimos e reservas antigos permanecem e aparecem como "(usuário excluído)".
+Com empréstimo ou reserva ativa, a exclusão continua bloqueada.
+
+Na devolução de um item com reserva aguardando, o exemplar fica separado para o
+primeiro da fila até o fim da validade (`regra.diasValidadeReserva`); só esse
+usuário consegue emprestá-lo, e a reserva passa a atendida.
+
+Validação: 53 testes unitários e 7 testes de integração aprovados em
+PostgreSQL 17 temporário, incluindo instalação limpa, atualização V3 → V4,
+exclusão com histórico (V5) e rollback de transação. As 13 telas foram abertas
+contra o banco local. As funcionalidades pendentes estão em `docs/PENDENCIAS.md`.

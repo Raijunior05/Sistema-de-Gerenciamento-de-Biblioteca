@@ -497,6 +497,7 @@ public class EditarUsuarioController {
         }
 
         final char[] senhaFinal = novaSenha;
+        final long idAdministradorLogado = Sessao.getAdministrador().getId();
 
         botaoSalvar.setDisable(true);
 
@@ -506,7 +507,7 @@ public class EditarUsuarioController {
 
                 App.servicos()
                         .usuarios()
-                        .editar(usuario, senhaFinal);
+                        .editar(usuario, senhaFinal, idAdministradorLogado);
 
                 return null;
             }

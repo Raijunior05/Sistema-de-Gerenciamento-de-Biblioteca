@@ -26,10 +26,12 @@ public class UsuarioService {
     /**
      * CU 3 - Cadastrar Usuario.
      *
+     * <p>Passo 03: o perfil Administrador exige tambem nome de usuario e senha.</p>
+     *
      * @param usuario dados vindos do formulario
      * @param senha   obrigatoria apenas para o perfil Administrador
-     * @throws RegraNegocioException      campo obrigatorio ausente
-     * @throws DadosDuplicadosException   fluxo alternativo 4.1
+     * @throws RegraNegocioException      fluxo alternativo 4.1, campo obrigatorio ausente
+     * @throws DadosDuplicadosException   fluxo alternativo 4.1, dado ja cadastrado
      */
     public void cadastrar(Usuario usuario, char[] senha) {
         validarCamposObrigatorios(usuario);
@@ -38,7 +40,7 @@ public class UsuarioService {
         if (usuario.getPerfil() == Perfil.ADMINISTRADOR) {
             if (senha == null || senha.length == 0) {
                 throw new RegraNegocioException(
-                        "O perfil Administrador exige a definicao de uma senha.");
+                        "O perfil Administrador exige a definição de uma senha.");
             }
             usuario.setSenhaHash(Senhas.gerarHash(senha));
         } else {
@@ -51,19 +53,47 @@ public class UsuarioService {
     }
 
     /**
-     * CU 4 - Editar Usuario.
+     * CU 4 - Editar Usuario, passos 04 e 05.
      *
-     * @param novaSenha quando nao nula, substitui a senha atual
+     * <p>Retirar o perfil Administrador segue as mesmas protecoes do CU 5,
+     * fluxo 4.1: o sistema nao pode ficar sem Administrador nem o operador
+     * pode retirar o proprio acesso.</p>
+     *
+     * @param novaSenha             quando nao nula, substitui a senha atual
+     * @param idAdministradorLogado Administrador que opera o sistema
+     * @throws RegraNegocioException    fluxo alternativo 4.1, dados invalidos
+     * @throws DadosDuplicadosException fluxo alternativo 4.1, dado ja cadastrado
      */
-    public void editar(Usuario usuario, char[] novaSenha) {
+    public void editar(Usuario usuario, char[] novaSenha, long idAdministradorLogado) {
         if (usuario.getId() == null) {
-            throw new RegraNegocioException("Usuario sem identificador nao pode ser editado.");
+            throw new RegraNegocioException("Usuário sem identificador não pode ser editado.");
         }
         validarCamposObrigatorios(usuario);
         validarDuplicidade(usuario, usuario.getId());
 
-        if (novaSenha != null && novaSenha.length > 0) {
-            usuario.setSenhaHash(Senhas.gerarHash(novaSenha));
+        Usuario atual = usuarioDAO.buscarPorId(usuario.getId())
+                .orElseThrow(() -> new RegraNegocioException("Usuário não encontrado."));
+        boolean perdeAdministrador = atual.getPerfil() == Perfil.ADMINISTRADOR
+                && usuario.getPerfil() != Perfil.ADMINISTRADOR;
+        if (perdeAdministrador && usuario.getId() == idAdministradorLogado) {
+            throw new RegraNegocioException(
+                    "Não é possível retirar o perfil Administrador do próprio usuário logado.");
+        }
+        if (perdeAdministrador && usuarioDAO.contarAdministradores() <= 1) {
+            throw new RegraNegocioException(
+                    "Este é o único Administrador cadastrado; o perfil não pode ser alterado.");
+        }
+
+        boolean informouSenha = novaSenha != null && novaSenha.length > 0;
+        if (usuario.getPerfil() == Perfil.ADMINISTRADOR) {
+            if (!informouSenha && atual.getSenhaHash() == null) {
+                throw new RegraNegocioException(
+                        "O perfil Administrador exige a definição de uma senha.");
+            }
+            usuario.setSenhaHash(informouSenha ? Senhas.gerarHash(novaSenha) : atual.getSenhaHash());
+        } else {
+            usuario.setLogin(null);
+            usuario.setSenhaHash(null);
         }
         usuarioDAO.atualizar(usuario);
     }
@@ -130,6 +160,18 @@ public class UsuarioService {
         boolean semMatricula = u.getMatricula() == null || u.getMatricula().isBlank();
         if (semCpf && semMatricula) {
             throw new RegraNegocioException("Informe o CPF ou a matricula do usuario.");
+        }
+        if (semCpf) {
+            u.setCpf(null);
+        }
+        if (semMatricula) {
+            u.setMatricula(null);
+        }
+        if (u.getLogin() != null && u.getLogin().isBlank()) {
+            u.setLogin(null);
+        }
+        if (u.getPerfil() == Perfil.ADMINISTRADOR && u.getLogin() == null) {
+            throw new RegraNegocioException("Informe o nome de usuário do Administrador.");
         }
     }
 

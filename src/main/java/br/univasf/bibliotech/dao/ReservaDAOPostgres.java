@@ -29,8 +29,8 @@ public class ReservaDAOPostgres implements ReservaDAO {
                    i.tombo AS i_tombo, i.quantidade_disp AS i_disp,
                    i.quantidade_total AS i_total
               FROM reserva r
-              JOIN usuario u ON u.id = r.usuario_id
-              JOIN item    i ON i.id = r.item_id
+              LEFT JOIN usuario u ON u.id = r.usuario_id
+              JOIN item         i ON i.id = r.item_id
             """;
 
     private final DataSource dataSource;
@@ -233,8 +233,8 @@ public class ReservaDAOPostgres implements ReservaDAO {
         r.setStatus(StatusReserva.valueOf(rs.getString("status")));
 
         Usuario u = new Usuario();
-        u.setId(rs.getLong("u_id"));
-        u.setNome(rs.getString("u_nome"));
+        u.setId(rs.getObject("u_id", Long.class));
+        u.setNome(u.getId() == null ? EmprestimoDAOPostgres.USUARIO_EXCLUIDO : rs.getString("u_nome"));
         u.setEmail(rs.getString("u_email"));
         u.setCpf(rs.getString("u_cpf"));
         u.setMatricula(rs.getString("u_matricula"));

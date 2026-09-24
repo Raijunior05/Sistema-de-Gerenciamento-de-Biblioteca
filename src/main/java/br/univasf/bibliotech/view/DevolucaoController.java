@@ -241,9 +241,9 @@ public class DevolucaoController {
             usuarioIdentificado =
                     tarefa.getValue().usuario();
 
+            // CU 9 passo 05: exibe os dados do Usuário encontrado
             rotuloUsuario.setText(
-                    "Usuário: "
-                            + usuarioIdentificado.getNome()
+                    DadosUsuario.formatar(usuarioIdentificado)
             );
 
             tabelaEmprestimos.getItems().setAll(
@@ -387,9 +387,11 @@ public class DevolucaoController {
 
             String aviso = tarefa.getValue()
                     .map(reserva ->
-                            "\nHá uma reserva na fila para esta obra. "
-                                    + "Prioridade: "
+                            "\n\nHá reserva aguardando este item. O exemplar foi separado "
+                                    + "para o 1º da fila, "
                                     + reserva.getUsuario().getNome()
+                                    + ", que tem prioridade na retirada até "
+                                    + Datas.formatar(reserva.getValidadeMaxima())
                                     + "."
                     )
                     .orElse("");

@@ -3,6 +3,7 @@ package br.univasf.bibliotech;
 import br.univasf.bibliotech.dao.EmprestimoDAOPostgres;
 import br.univasf.bibliotech.dao.ItemDAOPostgres;
 import br.univasf.bibliotech.dao.ReservaDAOPostgres;
+import br.univasf.bibliotech.dao.TransacaoJdbc;
 import br.univasf.bibliotech.dao.UsuarioDAOPostgres;
 import br.univasf.bibliotech.service.AutenticacaoService;
 import br.univasf.bibliotech.service.EmprestimoService;
@@ -60,18 +61,21 @@ public class App extends Application {
                 .migrate();
 
         // 2. Montagem das dependencias (view -> service -> dao -> banco).
-        var usuarioDAO = new UsuarioDAOPostgres(ds);
-        var itemDAO = new ItemDAOPostgres(ds);
-        var emprestimoDAO = new EmprestimoDAOPostgres(ds);
-        var reservaDAO = new ReservaDAOPostgres(ds);
+        // Os DAOs usam a transacao como DataSource para compartilhar a conexao dela.
+        var transacao = new TransacaoJdbc(ds);
+        var usuarioDAO = new UsuarioDAOPostgres(transacao);
+        var itemDAO = new ItemDAOPostgres(transacao);
+        var emprestimoDAO = new EmprestimoDAOPostgres(transacao);
+        var reservaDAO = new ReservaDAOPostgres(transacao);
 
+        int diasValidadeReserva = Configuracao.inteiro("regra.diasValidadeReserva");
         var autenticacao = new AutenticacaoService(usuarioDAO);
         var emprestimos = new EmprestimoService(
-                emprestimoDAO, itemDAO, reservaDAO,
+                emprestimoDAO, itemDAO, reservaDAO, transacao,
                 Configuracao.inteiro("regra.limiteEmprestimosPorUsuario"),
-                Configuracao.inteiro("regra.diasPrazoEmprestimo"));
-        var reservas = new ReservaService(
-                reservaDAO, itemDAO, Configuracao.inteiro("regra.diasValidadeReserva"));
+                Configuracao.inteiro("regra.diasPrazoEmprestimo"),
+                diasValidadeReserva);
+        var reservas = new ReservaService(reservaDAO, itemDAO, diasValidadeReserva);
 
         servicos = new Servicos(
                 autenticacao,
@@ -79,7 +83,7 @@ public class App extends Application {
                 new ItemService(itemDAO),
                 emprestimos,
                 reservas,
-                new RelatorioService(emprestimoDAO, reservaDAO, usuarioDAO));
+                new RelatorioService(emprestimoDAO, reservaDAO, usuarioDAO, itemDAO));
 
         // 3. Administrador de instalacao, se ainda nao houver nenhum.
         autenticacao.garantirAdministradorInicial(SENHA_ADMIN_PADRAO).ifPresent(admin ->

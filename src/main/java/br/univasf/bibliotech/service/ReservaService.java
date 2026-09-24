@@ -38,8 +38,11 @@ public class ReservaService {
             throw new RegraNegocioException("Selecione um item do acervo.");
         }
 
-        // Passo 03 e fluxo alternativo 3.1
-        if (itemDAO.quantidadeDisponivel(item.getId()) > 0) {
+        // Passo 03 e fluxo alternativo 3.1; exemplar separado para o 1o da fila nao esta livre
+        long separados = reservaDAO.listarPorItem(item.getId()).stream()
+                .filter(r -> r.getStatus() == StatusReserva.DISPONIVEL)
+                .count();
+        if (itemDAO.quantidadeDisponivel(item.getId()) > separados) {
             throw new RegraNegocioException(
                     "O item possui exemplar disponivel. Realize o emprestimo em vez da reserva.");
         }
@@ -60,16 +63,6 @@ public class ReservaService {
 
         reservaDAO.inserir(reserva);
         return reserva;
-    }
-
-    /** Libera a reserva do primeiro da fila apos a devolucao (CU 12, fluxo 7.1). */
-    public void liberarParaRetirada(Reserva reserva) {
-        if (reserva == null) {
-            return;
-        }
-        reserva.setStatus(StatusReserva.DISPONIVEL);
-        reserva.setValidadeMaxima(LocalDate.now().plusDays(diasValidade));
-        reservaDAO.atualizar(reserva);
     }
 
     public void cancelar(Reserva reserva) {

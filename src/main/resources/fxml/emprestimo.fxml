@@ -3,9 +3,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -25,75 +23,75 @@
         <Label text="REALIZAR EMPRÉSTIMO" styleClass="titulo-tela"
                layoutX="18" layoutY="16" prefWidth="344" alignment="CENTER"/>
 
-        <!-- Nome do título (Combobox para seleção da obra) -->
+        <!-- CU 10 passo 02: informar o item -->
         <Label text="Nome do título:" styleClass="rotulo-campo" layoutX="20" layoutY="60"/>
         <ComboBox fx:id="comboItem" promptText="Selecione um item..."
+                  onAction="#onVerificarDisponibilidade"
                   layoutX="18" layoutY="80" prefWidth="344"/>
 
-        <!-- Seleção CPF ou Matrícula -->
-        <Label text="CPF ou Matrícula:" styleClass="rotulo-campo" layoutX="20" layoutY="140"/>
-        <fx:define>
-            <ToggleGroup fx:id="grupoTipoDoc"/>
-        </fx:define>
-        <RadioButton fx:id="radioCpf" toggleGroup="$grupoTipoDoc" selected="true"
-                     layoutX="20" layoutY="166"/>
-        <RadioButton fx:id="radioMatricula" toggleGroup="$grupoTipoDoc"
-                     layoutX="50" layoutY="166"/>
-        <TextField fx:id="campoDocumento" layoutX="82" layoutY="160" prefWidth="280"/>
+        <!-- CU 10 passo 03: resultado da verificação de disponibilidade -->
+        <Label fx:id="rotuloDisponibilidade" text="Selecione o item para verificar a disponibilidade."
+               styleClass="aviso-disponibilidade" wrapText="true"
+               layoutX="20" layoutY="118" prefWidth="342" prefHeight="32"/>
 
-        <!-- Botão Identificar Usuário e Label com o Resultado -->
-        <Button text="Identificar Usuário" styleClass="botao-primario" onAction="#onIdentificarUsuario"
-                layoutX="18" layoutY="212" prefWidth="190" prefHeight="42"/>
+        <!-- CU 10 passos 04 a 06: identificação do Usuário (CU 9) -->
+        <Label text="CPF ou Matrícula:" styleClass="rotulo-campo" layoutX="20" layoutY="156"/>
+        <TextField fx:id="campoDocumento" promptText="Digite o CPF ou a matrícula"
+                   onAction="#onIdentificarUsuario" disable="true"
+                   layoutX="18" layoutY="178" prefWidth="344"/>
+        <Button fx:id="botaoIdentificar" text="Identificar Usuário" styleClass="botao-primario"
+                onAction="#onIdentificarUsuario" disable="true"
+                layoutX="18" layoutY="222" prefWidth="190" prefHeight="42"/>
         <Label fx:id="rotuloUsuarioIdentificado" text="Nenhum usuário identificado"
-               styleClass="rotulo-campo" layoutX="20" layoutY="274" prefWidth="344"/>
+               styleClass="dados-usuario" wrapText="true"
+               layoutX="20" layoutY="272" prefWidth="342" prefHeight="66"/>
 
-        <!-- Data de retirada (Três campos numéricos: Dia, Mês, Ano) -->
-        <Label text="Data de retirada:" styleClass="rotulo-campo" layoutX="20" layoutY="316"/>
-        <HBox layoutX="18" layoutY="340" spacing="8" prefWidth="344">
+        <!-- CU 10 passo 08: data do empréstimo registrada pelo sistema -->
+        <Label text="Data de retirada:" styleClass="rotulo-campo" layoutX="20" layoutY="344"/>
+        <HBox layoutX="18" layoutY="366" spacing="8" prefWidth="344">
             <VBox spacing="4">
                 <Label text="Dia:" styleClass="rotulo-campo" alignment="CENTER" prefWidth="108"/>
-                <TextField fx:id="campoDia" prefWidth="108" alignment="CENTER"/>
+                <TextField fx:id="campoDia" prefWidth="108" alignment="CENTER" editable="false"
+                           focusTraversable="false" styleClass="campo-somente-leitura"/>
             </VBox>
             <VBox spacing="4">
                 <Label text="Mês:" styleClass="rotulo-campo" alignment="CENTER" prefWidth="108"/>
-                <TextField fx:id="campoMes" prefWidth="108" alignment="CENTER"/>
+                <TextField fx:id="campoMes" prefWidth="108" alignment="CENTER" editable="false"
+                           focusTraversable="false" styleClass="campo-somente-leitura"/>
             </VBox>
             <VBox spacing="4">
                 <Label text="Ano:" styleClass="rotulo-campo" alignment="CENTER" prefWidth="112"/>
-                <TextField fx:id="campoAno" prefWidth="112" alignment="CENTER"/>
+                <TextField fx:id="campoAno" prefWidth="112" alignment="CENTER" editable="false"
+                           focusTraversable="false" styleClass="campo-somente-leitura"/>
             </VBox>
         </HBox>
 
-        <!-- Informação do prazo previsto calculado pelo sistema -->
+        <!-- Prazo previsto calculado pelo sistema -->
         <Label fx:id="rotuloPrazoDevolucao" text="Prazo previsto: —"
-               styleClass="rotulo-campo" layoutX="20" layoutY="416" prefWidth="344"/>
+               styleClass="rotulo-campo" layoutX="20" layoutY="440" prefWidth="344"/>
 
         <!-- Mensagens de Erro Inline -->
         <Label fx:id="mensagemErro" styleClass="mensagem-erro" wrapText="true"
-               layoutX="18" layoutY="446" prefWidth="344" prefHeight="36"/>
+               layoutX="18" layoutY="466" prefWidth="344" prefHeight="36"/>
 
-        <!-- Botão Reservar -->
-        <Button text="Item indisponível? Reservar"
-                styleClass="botao-menu"
-                onAction="#onReservarItem"
-                layoutX="18"
-                layoutY="500"
-                prefWidth="344"
-                prefHeight="42"/>
+        <!-- CU 10 fluxo 3.1: oferta de reserva, visível só com item indisponível -->
+        <Button fx:id="botaoReservar" text="Item indisponível: realizar reserva"
+                styleClass="botao-menu" onAction="#onReservarItem" visible="false"
+                layoutX="18" layoutY="506" prefWidth="344" prefHeight="42"/>
 
         <!-- Botões Cancelar e Concluído -->
         <Button text="Cancelar" styleClass="botao-menu" onAction="#onCancelar"
                 layoutX="18" layoutY="560" prefWidth="155" prefHeight="46"/>
         <Button fx:id="botaoSalvar" text="Concluído" styleClass="botao-primario"
-                onAction="#onSalvar" layoutX="207" layoutY="560" prefWidth="155"
+                onAction="#onSalvar" disable="true" layoutX="207" layoutY="560" prefWidth="155"
                 prefHeight="46" defaultButton="true"/>
     </AnchorPane>
 
     <Region HBox.hgrow="ALWAYS"/>
 
-    <!-- Lado Direito (Marca SGB e Ilustração de Livros) -->
+    <!-- Lado Direito (Marca BiblioTech e Ilustração de Livros) -->
     <VBox alignment="TOP_CENTER" spacing="4" prefWidth="330" minWidth="330" maxHeight="500">
-        <Label text="S G B" styleClass="marca-sgb,login-marca"/>
+        <Label text="BiblioTech" styleClass="marca-sgb,login-marca"/>
         <Label text="Sistema de Gerenciamento de Bibliotecas" styleClass="marca-legenda"/>
         <Region prefHeight="45"/>
         <ImageView fitWidth="405" fitHeight="260" preserveRatio="true">

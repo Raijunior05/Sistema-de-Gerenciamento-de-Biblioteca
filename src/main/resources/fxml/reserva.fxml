@@ -23,7 +23,7 @@
     <top>
         <HBox styleClass="cabecalho" alignment="CENTER_LEFT" spacing="12">
             <VBox alignment="CENTER_LEFT">
-                <Label text="S G B" styleClass="marca-sgb,marca-pequena"/>
+                <Label text="BiblioTech" styleClass="marca-sgb,marca-pequena"/>
                 <Label text="Sistema de Gerenciamento de Bibliotecas"
                        styleClass="marca-legenda,legenda-pequena"/>
             </VBox>

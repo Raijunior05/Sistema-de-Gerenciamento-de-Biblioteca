@@ -39,11 +39,11 @@
         <fx:define>
             <ToggleGroup fx:id="grupoTipoDoc"/>
         </fx:define>
-        <RadioButton fx:id="radioCpf" toggleGroup="$grupoTipoDoc" selected="true"
-                     layoutX="20" layoutY="208"/>
-        <RadioButton fx:id="radioMatricula" toggleGroup="$grupoTipoDoc"
-                     layoutX="50" layoutY="208"/>
-        <TextField fx:id="campoDocumento" layoutX="82" layoutY="202" prefWidth="280"/>
+        <RadioButton fx:id="radioCpf" text="CPF" styleClass="opcao-documento"
+                     toggleGroup="$grupoTipoDoc" selected="true" layoutX="186" layoutY="183"/>
+        <RadioButton fx:id="radioMatricula" text="Matrícula" styleClass="opcao-documento"
+                     toggleGroup="$grupoTipoDoc" layoutX="250" layoutY="183"/>
+        <TextField fx:id="campoDocumento" layoutX="18" layoutY="204" prefWidth="344"/>
 
         <!-- Perfil de Acesso -->
         <Label text="Perfil de acesso:" styleClass="rotulo-campo" layoutX="20" layoutY="248"/>
@@ -73,9 +73,9 @@
 
     <Region HBox.hgrow="ALWAYS"/>
 
-    <!-- Lado Direito (Marca SGB e Ilustração) -->
+    <!-- Lado Direito (Marca BiblioTech e Ilustração) -->
     <VBox alignment="TOP_CENTER" spacing="4" prefWidth="330" minWidth="330" maxHeight="500">
-        <Label text="S G B" styleClass="marca-sgb,login-marca"/>
+        <Label text="BiblioTech" styleClass="marca-sgb,login-marca"/>
         <Label text="Sistema de Gerenciamento de Bibliotecas" styleClass="marca-legenda"/>
         <Region prefHeight="45"/>
         <ImageView fitWidth="405" fitHeight="260" preserveRatio="true">

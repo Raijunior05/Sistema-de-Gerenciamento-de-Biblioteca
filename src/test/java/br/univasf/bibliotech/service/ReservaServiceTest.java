@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -87,15 +88,18 @@ class ReservaServiceTest {
     }
 
     @Test
-    @DisplayName("CU 12 fluxo 7.1: libera o primeiro da fila apos a devolucao")
-    void deveLiberarReservaParaRetirada() {
-        Reserva reserva = new Reserva(usuario, item, 1);
-        reserva.setId(7L);
-        reserva.setStatus(StatusReserva.AGUARDANDO);
+    @DisplayName("fluxo 3.1: exemplar separado para o primeiro da fila nao impede nova reserva")
+    void devePermitirReservaQuandoExemplarEstaSeparado() {
+        Reserva separada = new Reserva(new Usuario(2L, "Bruno"), item, 1);
+        separada.setStatus(StatusReserva.DISPONIVEL);
+        when(itemDAO.quantidadeDisponivel(10L)).thenReturn(1);
+        when(reservaDAO.listarPorItem(10L)).thenReturn(List.of(separada));
+        when(reservaDAO.possuiReservaAtiva(1L, 10L)).thenReturn(false);
+        when(reservaDAO.proximaPosicaoFila(10L)).thenReturn(2);
 
-        service.liberarParaRetirada(reserva);
+        Reserva reserva = service.registrar(usuario, item, administrador);
 
-        assertEquals(StatusReserva.DISPONIVEL, reserva.getStatus());
-        verify(reservaDAO).atualizar(reserva);
+        assertEquals(2, reserva.getPosicaoFila());
+        verify(reservaDAO).inserir(reserva);
     }
 }

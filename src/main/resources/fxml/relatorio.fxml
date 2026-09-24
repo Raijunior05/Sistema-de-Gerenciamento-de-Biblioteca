@@ -16,6 +16,7 @@
     </HBox>
     <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
         <tabs>
+            <Tab text="Gerar Relatório"><content><VBox fx:id="areaGerar" spacing="16"/></content></Tab>
             <Tab text="Consultar Empréstimos"><content><VBox fx:id="areaEmprestimos" spacing="16"/></content></Tab>
             <Tab text="Consultar Reservas"><content><VBox fx:id="areaReservas" spacing="16"/></content></Tab>
         </tabs>

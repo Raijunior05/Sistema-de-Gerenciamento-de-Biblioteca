@@ -11,10 +11,13 @@ import br.univasf.bibliotech.model.Emprestimo;
 import br.univasf.bibliotech.model.Item;
 import br.univasf.bibliotech.model.Reserva;
 import br.univasf.bibliotech.model.StatusEmprestimo;
+import br.univasf.bibliotech.model.StatusReserva;
 import br.univasf.bibliotech.model.Usuario;
+import br.univasf.bibliotech.util.Transacao;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -22,25 +25,47 @@ import java.util.Optional;
  *
  * <p>Concentra as regras que o prototipo delegava ao Administrador:
  * o prazo de devolucao e calculado, nao digitado, e o calculo de atraso
- * acontece automaticamente no ato da devolucao.</p>
+ * acontece automaticamente no ato da devolucao. Registro e baixa no acervo
+ * acontecem na mesma transacao.</p>
  */
 public class EmprestimoService {
 
     private final EmprestimoDAO emprestimoDAO;
     private final ItemDAO itemDAO;
     private final ReservaDAO reservaDAO;
+    private final Transacao transacao;
 
     private final int limiteEmprestimos;
     private final int diasPrazo;
+    private final int diasValidadeReserva;
 
-    /** CU 10 passos 07 e 08 e CU 12: dependencias e parametros de limite e prazo. */
+    /** CU 10 passos 07 e 08 e CU 12 fluxo 7.1: dependencias e parametros configurados. */
     public EmprestimoService(EmprestimoDAO emprestimoDAO, ItemDAO itemDAO, ReservaDAO reservaDAO,
-                             int limiteEmprestimos, int diasPrazo) {
+                             Transacao transacao, int limiteEmprestimos, int diasPrazo,
+                             int diasValidadeReserva) {
         this.emprestimoDAO = emprestimoDAO;
         this.itemDAO = itemDAO;
         this.reservaDAO = reservaDAO;
+        this.transacao = transacao;
         this.limiteEmprestimos = limiteEmprestimos;
         this.diasPrazo = diasPrazo;
+        this.diasValidadeReserva = diasValidadeReserva;
+    }
+
+    /**
+     * CU 10 passo 03 - verificarDisponibilidade(id_item).
+     *
+     * <p>Exemplares separados para o primeiro da fila (CU 12, fluxo 7.1) nao
+     * contam como livres.</p>
+     *
+     * @return exemplares que podem ser emprestados a qualquer usuario
+     */
+    public int verificarDisponibilidade(long itemId) {
+        int disponiveis = itemDAO.quantidadeDisponivel(itemId);
+        long separados = reservasAtivas(itemId).stream()
+                .filter(r -> r.getStatus() == StatusReserva.DISPONIVEL)
+                .count();
+        return (int) Math.max(0, disponiveis - separados);
     }
 
     /**
@@ -48,7 +73,8 @@ public class EmprestimoService {
      *
      * <p>Ordem das validacoes, seguindo os passos da especificacao:
      * disponibilidade (passo 03), limite e pendencias (passo 07),
-     * registro (passo 08) e baixa no acervo (passo 09).</p>
+     * registro (passo 08) e baixa no acervo (passo 09). O exemplar separado
+     * para o primeiro da fila so pode ser retirado por ele (CU 12, fluxo 7.1).</p>
      *
      * @param usuario Usuario ja identificado pelo CU 9
      * @param item    item selecionado do acervo
@@ -60,76 +86,110 @@ public class EmprestimoService {
      */
     public Emprestimo registrar(Usuario usuario, Item item, Usuario administrador) {
         if (usuario == null || usuario.getId() == null) {
-            throw new RegraNegocioException("Identifique o usuario antes de registrar o emprestimo.");
+            throw new RegraNegocioException("Identifique o usuário antes de registrar o empréstimo.");
         }
         if (item == null || item.getId() == null) {
             throw new RegraNegocioException("Selecione um item do acervo.");
         }
 
-        // Passo 03 - disponibilidade
-        if (itemDAO.quantidadeDisponivel(item.getId()) <= 0) {
-            throw new ItemIndisponivelException(item);
-        }
+        return transacao.executar(() -> {
+            // Passo 03 - disponibilidade
+            int disponiveis = itemDAO.quantidadeDisponivel(item.getId());
+            if (disponiveis <= 0) {
+                throw new ItemIndisponivelException(item);
+            }
 
-        // Passo 07 - limite de emprestimos
-        int ativos = emprestimoDAO.contarAtivosPorUsuario(usuario.getId());
-        if (ativos >= limiteEmprestimos) {
-            throw new LimiteExcedidoException(limiteEmprestimos, ativos);
-        }
+            // CU 12 fluxo 7.1 - exemplar separado para o primeiro da fila
+            List<Reserva> ativas = reservasAtivas(item.getId());
+            Optional<Reserva> reservaDoUsuario = ativas.stream()
+                    .filter(r -> Objects.equals(r.getUsuario().getId(), usuario.getId()))
+                    .findFirst();
+            long separadosParaOutros = ativas.stream()
+                    .filter(r -> r.getStatus() == StatusReserva.DISPONIVEL)
+                    .filter(r -> !Objects.equals(r.getUsuario().getId(), usuario.getId()))
+                    .count();
+            if (disponiveis <= separadosParaOutros) {
+                throw new ItemIndisponivelException(item, "O exemplar disponível de \""
+                        + item.getTitulo() + "\" está separado para o primeiro Usuário da fila "
+                        + "de reserva. Deseja registrar uma reserva?");
+            }
 
-        // Passo 07 - pendencias (itens em atraso)
-        if (emprestimoDAO.possuiPendencia(usuario.getId())) {
-            throw new PendenciaException("há item em atraso.");
-        }
+            // Passo 07 - limite de emprestimos
+            int ativos = emprestimoDAO.contarAtivosPorUsuario(usuario.getId());
+            if (ativos >= limiteEmprestimos) {
+                throw new LimiteExcedidoException(limiteEmprestimos, ativos);
+            }
 
-        // Passo 08 - registro com prazo calculado pelo sistema
-        LocalDate hoje = LocalDate.now();
-        Emprestimo emprestimo = new Emprestimo(usuario, item, hoje.plusDays(diasPrazo));
-        emprestimo.setDataEmprestimo(hoje);
-        emprestimo.setStatus(StatusEmprestimo.EM_ANDAMENTO);
-        emprestimo.setRegistradoPor(administrador);
-        emprestimoDAO.inserir(emprestimo);
+            // Passo 07 - pendencias (itens em atraso)
+            if (emprestimoDAO.possuiPendencia(usuario.getId())) {
+                throw new PendenciaException("há item em atraso.");
+            }
 
-        // Passo 09 - baixa na disponibilidade
-        if (!itemDAO.decrementarDisponivel(item.getId())) {
-            throw new ItemIndisponivelException(item);
-        }
+            // Passo 08 - registro com prazo calculado pelo sistema
+            LocalDate hoje = LocalDate.now();
+            Emprestimo emprestimo = new Emprestimo(usuario, item, hoje.plusDays(diasPrazo));
+            emprestimo.setDataEmprestimo(hoje);
+            emprestimo.setStatus(StatusEmprestimo.EM_ANDAMENTO);
+            emprestimo.setRegistradoPor(administrador);
+            emprestimoDAO.inserir(emprestimo);
 
-        return emprestimo;
+            // Passo 09 - baixa na disponibilidade (falha desfaz o passo 08)
+            if (!itemDAO.decrementarDisponivel(item.getId())) {
+                throw new ItemIndisponivelException(item);
+            }
+
+            // A reserva do usuario para este item foi atendida pelo emprestimo
+            reservaDoUsuario.ifPresent(reserva -> {
+                reserva.setStatus(StatusReserva.ATENDIDA);
+                reservaDAO.atualizar(reserva);
+            });
+
+            return emprestimo;
+        });
     }
 
     /**
-     * CU 12 - Realizar Devolucao.
+     * CU 12 - Realizar Devolucao, passos 05 a 07.
      *
-     * <p>Fluxo alternativo 5.1: registra os dias de atraso e conclui a devolucao.</p>
+     * <p>Fluxo alternativo 5.1: registra os dias de atraso e conclui a devolucao.
+     * Fluxo alternativo 7.1: o primeiro da fila passa a ter o exemplar separado
+     * para retirada ate o fim da validade da reserva.</p>
      *
      * @param emprestimo emprestimo selecionado pelo Administrador
      * @return a reserva com prioridade de retirada, quando existir (fluxo 7.1)
      */
     public Optional<Reserva> registrarDevolucao(Emprestimo emprestimo) {
         if (emprestimo == null || emprestimo.getId() == null) {
-            throw new RegraNegocioException("Selecione o emprestimo a ser devolvido.");
+            throw new RegraNegocioException("Selecione o empréstimo a ser devolvido.");
         }
         if (emprestimo.getStatus() == StatusEmprestimo.CONCLUIDO) {
-            throw new RegraNegocioException("Este emprestimo ja foi devolvido.");
+            throw new RegraNegocioException("Este empréstimo já foi devolvido.");
         }
 
-        LocalDate hoje = LocalDate.now();
+        return transacao.executar(() -> {
+            LocalDate hoje = LocalDate.now();
 
-        // Passo 05 e fluxo 5.1 - comparacao de datas e calculo do atraso
-        long atraso = emprestimo.calcularDiasAtraso(hoje);
-        emprestimo.setDiasAtraso((int) atraso);
+            // Passo 05 e fluxo 5.1 - comparacao de datas e calculo do atraso
+            long atraso = emprestimo.calcularDiasAtraso(hoje);
+            emprestimo.setDiasAtraso((int) atraso);
 
-        // Passo 06 - conclusao do emprestimo
-        emprestimo.setDataDevolucao(hoje);
-        emprestimo.setStatus(StatusEmprestimo.CONCLUIDO);
-        emprestimoDAO.atualizar(emprestimo);
+            // Passo 06 - conclusao do emprestimo
+            emprestimo.setDataDevolucao(hoje);
+            emprestimo.setStatus(StatusEmprestimo.CONCLUIDO);
+            emprestimoDAO.atualizar(emprestimo);
 
-        // Passo 07 - reposicao no acervo
-        itemDAO.incrementarDisponivel(emprestimo.getItem().getId());
+            // Passo 07 - reposicao no acervo
+            itemDAO.incrementarDisponivel(emprestimo.getItem().getId());
 
-        // Fluxo 7.1 - primeiro da fila tem prioridade
-        return reservaDAO.primeiroDaFila(emprestimo.getItem().getId());
+            // Fluxo 7.1 - primeiro da fila tem prioridade na retirada
+            Optional<Reserva> primeiro = reservaDAO.primeiroDaFila(emprestimo.getItem().getId());
+            primeiro.ifPresent(reserva -> {
+                reserva.setStatus(StatusReserva.DISPONIVEL);
+                reserva.setValidadeMaxima(hoje.plusDays(diasValidadeReserva));
+                reservaDAO.atualizar(reserva);
+            });
+            return primeiro;
+        });
     }
 
     /** CU 12 passo 04: emprestimos em aberto do usuario identificado. */
@@ -161,5 +221,11 @@ public class EmprestimoService {
     /** CU 10 passo 08: prazo configurado para a devolucao. */
     public int getDiasPrazo() {
         return diasPrazo;
+    }
+
+    private List<Reserva> reservasAtivas(long itemId) {
+        return reservaDAO.listarPorItem(itemId).stream()
+                .filter(r -> r.getStatus().estaAtiva())
+                .toList();
     }
 }

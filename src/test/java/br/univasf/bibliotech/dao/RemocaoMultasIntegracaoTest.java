@@ -95,7 +95,8 @@ class RemocaoMultasIntegracaoTest {
             emprestimos.inserir(aberto);
             // Mesmo sem atualizar o status no start, a data vencida deve bloquear.
             assertTrue(emprestimos.possuiPendencia(usuario.getId()));
-            EmprestimoService service = new EmprestimoService(emprestimos, itens, reservas, 3, 15);
+            EmprestimoService service = new EmprestimoService(emprestimos, itens, reservas,
+                    new TransacaoJdbc(ds), 3, 15, 7);
             service.registrarDevolucao(aberto);
             assertFalse(emprestimos.possuiPendencia(usuario.getId()));
             assertEquals(3, emprestimos.buscarPorId(aberto.getId()).orElseThrow().getDiasAtraso());

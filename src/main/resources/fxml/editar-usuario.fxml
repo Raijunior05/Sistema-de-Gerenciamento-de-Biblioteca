@@ -27,7 +27,7 @@
               spacing="12">
 
             <VBox alignment="CENTER_LEFT">
-                <Label text="S G B"
+                <Label text="BiblioTech"
                        styleClass="marca-sgb,marca-pequena"/>
 
                 <Label text="Sistema de Gerenciamento de Bibliotecas"
@@ -220,7 +220,7 @@
                       spacing="4"
                       prefWidth="380">
 
-                    <Label text="S G B"
+                    <Label text="BiblioTech"
                            styleClass="marca-sgb,login-marca"/>
 
                     <Label text="Sistema de Gerenciamento de Bibliotecas"

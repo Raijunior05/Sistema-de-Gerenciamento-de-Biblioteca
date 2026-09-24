@@ -30,7 +30,7 @@
 
             <VBox alignment="CENTER_LEFT">
 
-                <Label text="S G B"
+                <Label text="BiblioTech"
                        styleClass="marca-sgb,marca-pequena"/>
 
                 <Label text="Sistema de Gerenciamento de Bibliotecas"

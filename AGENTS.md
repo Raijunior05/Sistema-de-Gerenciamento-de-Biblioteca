@@ -78,7 +78,14 @@ mvn test -Dtest=EmprestimoServiceTest
 
 # Empacotar
 mvn clean package
+
+# Dados de demonstração (banco no ar e schema já criado pelo app)
+powershell -ExecutionPolicy Bypass -File scripts\seed-demo.ps1   # ou: sh scripts/seed-demo.sh
 ```
+
+O seed usa e-mails `@demo.bibliotech.local` e tombos/códigos `DEM-` para poder
+ser reexecutado sem afetar outros dados. Ao mudar o schema, confira se
+`scripts/seed-demo.sql` continua válido; não o transforme em migration.
 
 Credenciais do administrador criado na primeira execução:
 `admin@bibliotech.local` / `admin123`.
@@ -97,6 +104,8 @@ bibliotech/
 │   ├── ARQUITETURA.md         camadas, threading, decisões
 │   ├── MODELO-DADOS.md        tabelas, constraints, rastreabilidade
 │   └── PENDENCIAS.md          o que falta implementar
+├── scripts/
+│   └── seed-demo.sql/.ps1/.sh dados de demonstração (execução manual)
 └── src/
     ├── main/
     │   ├── java/br/univasf/bibliotech/
@@ -214,15 +223,19 @@ documento — não reintroduza.
 | CPF ou matrícula obrigatório | CU 3 | `UsuarioService` + constraint | `RegraNegocioException` |
 | Exclusão com pendência | CU 5, 4.1 | `UsuarioService` | `ExclusaoNaoPermitidaException` |
 | Último administrador | CU 5, 4.1 | `UsuarioService` | `ExclusaoNaoPermitidaException` |
+| Nome de usuário do Administrador | CU 3, 4.1 | `UsuarioService` | `RegraNegocioException` |
+| Rebaixar último/próprio Administrador | CU 4, 4.1 | `UsuarioService.editar` | `RegraNegocioException` |
 | ISBN duplicado | CU 7, 5.1 | `ItemService` | `DadosDuplicadosException` |
 | Usuário não encontrado | CU 9, 4.1 | `UsuarioService` | `UsuarioNaoEncontradoException` |
 | Item indisponível | CU 10, 3.1 | `EmprestimoService` | `ItemIndisponivelException` |
+| Exemplar separado para o 1º da fila | CU 12, 7.1 | `EmprestimoService.registrar` | `ItemIndisponivelException` |
 | Limite de empréstimos | CU 10, 7.1 | `EmprestimoService` | `LimiteExcedidoException` |
 | Empréstimo aberto vencido pela data atual | CU 10, 7.1 | `EmprestimoService` + `EmprestimoDAO.possuiPendencia` | `PendenciaException` |
 | Reserva de item disponível | CU 11, 3.1 | `ReservaService` | `RegraNegocioException` |
 | Reserva duplicada | CU 11, 5.1 | `ReservaService` + índice | `RegraNegocioException` |
 | Cálculo de dias de atraso | CU 12, 5.1 | `Emprestimo.calcularDiasAtraso` | — |
-| Prioridade do 1º da fila | CU 12, 7.1 | `EmprestimoService` | — |
+| Prioridade do 1º da fila (exemplar separado, reserva DISPONIVEL) | CU 12, 7.1 | `EmprestimoService` | — |
+| Registro + baixa / devolução + reposição atômicos | CU 10, 08–09; CU 12, 06–07 | `Transacao` | — |
 
 **Não há multa no escopo atual.** O CU 12, fluxo 5.1 registra somente dias de atraso.
 Não crie cobrança, quitação, `MultaService` ou bloqueio financeiro. Atraso histórico
@@ -244,6 +257,18 @@ regra.diasValidadeReserva=7
 
 Quatro tabelas: `usuario`, `item`, `emprestimo`, `reserva`.
 Detalhamento completo em `docs/MODELO-DADOS.md`.
+
+Migrations V1 a V5. A V5 troca as FKs de usuário por `ON DELETE SET NULL`
+(histórico encerrado sobrevive à exclusão, exibido como "(usuário excluído)")
+e acrescenta `chk_emprestimo_usuario_ativo` e `chk_reserva_usuario_ativo`.
+Por isso os DAOs de empréstimo e reserva usam `LEFT JOIN usuario`.
+
+### Transações
+
+Services recebem `util.Transacao` (sem `java.sql`) e envolvem os movimentos em
+`transacao.executar(...)`. A implementação `dao.TransacaoJdbc` também é o
+`DataSource` passado aos DAOs em `App.init()`; não crie DAO com o pool direto
+na aplicação. Nos testes unitários, use `Transacao.direta()`.
 
 ### Regra crítica sobre migrations
 
@@ -492,8 +517,9 @@ classe, o que é compatível com as duas opções.
 
 ## 15. Navegação e manutenção da documentação (15/09/2026)
 
-- Consultas de empréstimos e reservas existem **somente dentro de Relatórios**,
-  em abas de `relatorio.fxml` / `RelatorioController`. Não recrie atalhos na inicial
+- `relatorio.fxml` tem a aba **Gerar Relatório** (CU 13: tipo, filtros do tipo,
+  relatório com resumo) e as abas de consulta. Consultas de empréstimos e reservas
+  existem **somente dentro de Relatórios**, em abas de `relatorio.fxml` / `RelatorioController`. Não recrie atalhos na inicial
   nem rotas `CONSULTA_EMPRESTIMOS` / `CONSULTA_RESERVAS`.
 - Acesso rápido da visão geral: **Gerar Relatório**, **Pesquisar Acervo**,
   **Cadastrar item**, **Realizar reserva** e **Realizar devolução**.
@@ -503,8 +529,10 @@ classe, o que é compatível com as duas opções.
 - Os indicadores continuam usando `RelatorioService` dentro de `Task`.
   As consultas reutilizam `EmprestimoService.pesquisar` e `ReservaService.pesquisar`
   também em `Task`; leia os filtros na thread JavaFX antes de iniciar a tarefa.
-- Login, visão geral e consultas em Relatórios estão implementados. Os demais
-  FXML e a exportação CSV continuam pendentes; não documente planejamento como entrega.
+- Todas as telas dos casos de uso existem. A exportação CSV continua pendente;
+  não documente planejamento como entrega.
+- A marca exibida nas telas é **BiblioTech** (antes "S G B"); as classes CSS
+  `marca-sgb` mantêm o nome antigo.
 - Atualize **README.md**, **AGENTS.md** e os documentos afetados em **docs/** em cada tarefa.
 - Configuração local em `/database.properties` e arquivos de IDE/build ficam fora do Git.
   Na instalação nativa, crie o banco com o usuário da aplicação como proprietário.
@@ -515,10 +543,10 @@ classe, o que é compatível com as duas opções.
 
 - Consulte `docs/PENDENCIAS.md` para o estado da implementação. Valide os
   critérios de aceite contra os requisitos e os artefatos UML antes de ampliar regras.
-- A presença de service/DAO não significa fluxo concluído: transações dos
-  movimentos, prioridade/atendimento da fila, edição de perfil, preservação do
-  histórico e relatórios têm pendências registradas. Não documente essas garantias
-  como completas com base apenas nos testes unitários.
+- Transações dos movimentos, prioridade da fila, proteção de perfil na edição,
+  preservação do histórico na exclusão e os quatro tipos do CU 13 foram concluídos
+  em 24/09/2026. Continuam pendentes a geração concorrente de códigos (MAX+1),
+  a promoção da fila na expiração de reserva e a exportação CSV.
 - Atualize `PENDENCIAS.md` ao concluir uma tarefa. Não altere cartões
   externos sem solicitação explícita do usuário.
 
@@ -532,5 +560,6 @@ classe, o que é compatível com as duas opções.
   e na preparação do teste de migração são exclusivamente legado.
 - Pendência de empréstimo é registro não concluído com `data_prevista < CURRENT_DATE`.
   Não dependa apenas do status ATRASADO atualizado na inicialização.
-- Remoção de multas e seleção de testes de integração concluídas: 34 testes unitários e 5 de integração aprovados
-  com Java 21/PostgreSQL 17. Docker 29 exigiu `-Dapi.version=1.44` no Maven.
+- Remoção de multas e seleção de testes de integração concluídas. Estado em
+  24/09/2026: 53 testes unitários e 7 de integração aprovados com PostgreSQL 17.
+  Docker 29 exigiu `-Dapi.version=1.44` no Maven.

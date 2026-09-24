@@ -134,11 +134,17 @@ item na mesma consulta, evitando o problema N+1 ao montar as tabelas.
 
 ## Concorrência no acervo
 
-**Limite da implementação atual:** a atomicidade descrita abaixo é apenas da
-baixa de estoque. Inserção do empréstimo e baixa usam conexões separadas; conclusão
-da devolução e reposição também. Ainda falta uma transação que confirme ou desfaça
-o movimento inteiro. A geração MAX+1 de códigos/posições e a prioridade da fila
-também precisam de tratamento concorrente. Ver `PENDENCIAS.md`.
+**Transações.** `util.Transacao` delimita a unidade de trabalho sem expor JDBC
+ao service; `dao.TransacaoJdbc` a implementa e também é o `DataSource` entregue
+aos DAOs em `App.init()`. Dentro de `executar`, todo `getConnection()` da mesma
+thread recebe a conexão da transação, e o `close()` do try-with-resources do DAO
+não a devolve ao pool antes do commit ou rollback. Assim os DAOs seguem o padrão
+de sempre. O CU 10 (passos 07 a 09 e baixa da reserva atendida) e o CU 12
+(passos 06 e 07 e separação do exemplar para o 1º da fila) confirmam ou desfazem
+o movimento inteiro. Nos testes unitários, `Transacao.direta()` só executa a ação.
+
+A geração MAX+1 de tombo, código e posição na fila ainda pode colidir entre dois
+atendimentos simultâneos. Ver `PENDENCIAS.md`.
 
 `decrementarDisponivel` usa `WHERE id = ? AND quantidade_disp > 0` e devolve
 `false` quando não afeta nenhuma linha. Isso torna a operação atômica: se
@@ -167,9 +173,12 @@ padrão, para que `mvn test` continue rodando em segundos.
 
 ## Navegação e recursos visuais
 
-A visão geral abre `Navegador.Tela.RELATORIO`. As consultas de empréstimos e
-reservas são abas internas de `relatorio.fxml`, controladas por
-`RelatorioController`, sem rotas independentes ou atalhos na tela inicial.
+A visão geral abre `Navegador.Tela.RELATORIO`. A primeira aba, **Gerar
+Relatório**, segue o CU 13: tipo (passo 01), filtros do tipo (passo 02) e
+relatório com cabeçalho e resumo (passo 04), com um método de `RelatorioService`
+por tipo. As consultas de empréstimos e reservas são as outras abas de
+`relatorio.fxml`, controladas por `RelatorioController`, sem rotas independentes
+ou atalhos na tela inicial.
 Cada aba captura seus filtros antes de iniciar um `Task`, chama o service
 correspondente e atualiza a tabela em `setOnSucceeded`. Durante a consulta,
 os filtros ficam desabilitados para impedir respostas concorrentes na mesma aba.
@@ -196,5 +205,4 @@ O service usa esse resultado para bloquear um novo empréstimo por atraso aberto
 
 O Flyway aplica V4 na inicialização, removendo apenas os campos financeiros legados
 e mantendo os demais dados. A integração verifica tanto instalação limpa quanto
-migração V3 → V4. Movimentações e estoque ainda usam conexões separadas;
-as garantias transacionais continuam pendentes, conforme `PENDENCIAS.md`.
+migração V3 → V4, além do rollback da transação e da exclusão com histórico (V5).

@@ -13,6 +13,7 @@ import br.univasf.bibliotech.model.Reserva;
 import br.univasf.bibliotech.model.StatusEmprestimo;
 import br.univasf.bibliotech.model.StatusReserva;
 import br.univasf.bibliotech.model.Usuario;
+import br.univasf.bibliotech.util.Transacao;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -22,6 +23,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,6 +48,7 @@ class EmprestimoServiceTest {
 
     private static final int LIMITE = 3;
     private static final int PRAZO_DIAS = 15;
+    private static final int VALIDADE_RESERVA = 7;
 
     @Mock private EmprestimoDAO emprestimoDAO;
     @Mock private ItemDAO itemDAO;
@@ -59,7 +62,7 @@ class EmprestimoServiceTest {
     @BeforeEach
     void preparar() {
         service = new EmprestimoService(emprestimoDAO, itemDAO, reservaDAO,
-                LIMITE, PRAZO_DIAS);
+                Transacao.direta(), LIMITE, PRAZO_DIAS, VALIDADE_RESERVA);
 
         usuario = new Usuario(1L, "Carlos Alberto Souza");
         usuario.setCpf("111.111.111-11");
@@ -133,6 +136,48 @@ class EmprestimoServiceTest {
         }
 
         @Test
+        @DisplayName("fluxo 3.1: exemplar separado para o primeiro da fila nao e emprestado a outro")
+        void deveRecusarExemplarSeparadoParaOutroUsuario() {
+            when(itemDAO.quantidadeDisponivel(10L)).thenReturn(1);
+            when(reservaDAO.listarPorItem(10L)).thenReturn(List.of(
+                    reserva(new Usuario(2L, "Amanda"), StatusReserva.DISPONIVEL)));
+
+            assertThrows(ItemIndisponivelException.class,
+                    () -> service.registrar(usuario, item, administrador));
+
+            verify(emprestimoDAO, never()).inserir(any());
+            verify(itemDAO, never()).decrementarDisponivel(anyLong());
+        }
+
+        @Test
+        @DisplayName("CU 12 fluxo 7.1: o primeiro da fila retira o exemplar e a reserva e atendida")
+        void devePermitirRetiradaPeloPrimeiroDaFila() {
+            Reserva reservaDoUsuario = reserva(usuario, StatusReserva.DISPONIVEL);
+            when(itemDAO.quantidadeDisponivel(10L)).thenReturn(1);
+            when(reservaDAO.listarPorItem(10L)).thenReturn(List.of(reservaDoUsuario));
+            when(emprestimoDAO.contarAtivosPorUsuario(1L)).thenReturn(0);
+            when(emprestimoDAO.possuiPendencia(1L)).thenReturn(false);
+            when(itemDAO.decrementarDisponivel(10L)).thenReturn(true);
+
+            service.registrar(usuario, item, administrador);
+
+            verify(emprestimoDAO).inserir(any(Emprestimo.class));
+            assertEquals(StatusReserva.ATENDIDA, reservaDoUsuario.getStatus());
+            verify(reservaDAO).atualizar(reservaDoUsuario);
+        }
+
+        @Test
+        @DisplayName("passo 03: exemplares separados para reserva nao contam como disponiveis")
+        void deveDescontarExemplaresSeparados() {
+            when(itemDAO.quantidadeDisponivel(10L)).thenReturn(2);
+            when(reservaDAO.listarPorItem(10L)).thenReturn(List.of(
+                    reserva(new Usuario(2L, "Amanda"), StatusReserva.DISPONIVEL),
+                    reserva(new Usuario(3L, "Bruno"), StatusReserva.AGUARDANDO)));
+
+            assertEquals(1, service.verificarDisponibilidade(10L));
+        }
+
+        @Test
         @DisplayName("exige identificacao previa do usuario (CU 9)")
         void deveExigirUsuarioIdentificado() {
             assertThrows(RegraNegocioException.class,
@@ -176,8 +221,8 @@ class EmprestimoServiceTest {
         }
 
         @Test
-        @DisplayName("fluxo 7.1: informa o primeiro da fila de reserva")
-        void deveInformarReservaComPrioridade() {
+        @DisplayName("fluxo 7.1: separa o exemplar para o primeiro da fila")
+        void deveSepararExemplarParaPrimeiroDaFila() {
             Emprestimo emprestimo = emprestimoComPrazo(LocalDate.now().plusDays(1));
 
             Reserva primeira = new Reserva(new Usuario(2L, "Amanda"), item, 1);
@@ -188,6 +233,9 @@ class EmprestimoServiceTest {
 
             assertTrue(fila.isPresent());
             assertTrue(fila.get().temPrioridade());
+            assertEquals(StatusReserva.DISPONIVEL, primeira.getStatus());
+            assertEquals(LocalDate.now().plusDays(VALIDADE_RESERVA), primeira.getValidadeMaxima());
+            verify(reservaDAO).atualizar(primeira);
         }
 
         @Test
@@ -209,6 +257,12 @@ class EmprestimoServiceTest {
             e.setStatus(StatusEmprestimo.EM_ANDAMENTO);
             return e;
         }
+    }
+
+    private Reserva reserva(Usuario dono, StatusReserva status) {
+        Reserva r = new Reserva(dono, item, 1);
+        r.setStatus(status);
+        return r;
     }
 
     @Nested

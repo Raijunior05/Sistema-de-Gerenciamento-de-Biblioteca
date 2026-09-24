@@ -196,12 +196,13 @@ public class ReservaController {
         comboItem.setDisable(true);
         botaoVerificar.setDisable(true);
 
-        Task<Item> tarefa = new Task<>() {
+        // CU 11 passo 03: exemplar separado para o 1o da fila não conta como livre
+        Task<Integer> tarefa = new Task<>() {
             @Override
-            protected Item call() {
+            protected Integer call() {
                 return App.servicos()
-                        .itens()
-                        .buscar(selecionado.getId());
+                        .emprestimos()
+                        .verificarDisponibilidade(selecionado.getId());
             }
         };
 
@@ -209,15 +210,9 @@ public class ReservaController {
             comboItem.setDisable(false);
             botaoVerificar.setDisable(false);
 
-            Item itemAtual = tarefa.getValue();
+            Item itemAtual = selecionado;
 
-            if (itemAtual == null) {
-                mensagemErro.setText("Item não encontrado no acervo.");
-                atualizarBotoes();
-                return;
-            }
-
-            if (itemAtual.getQuantidadeDisponivel() > 0) {
+            if (tarefa.getValue() > 0) {
                 // Fluxo alternativo 3.1
                 rotuloDisponibilidade.setText(
                         "Item disponível: a reserva não é permitida. "
@@ -238,7 +233,7 @@ public class ReservaController {
                 botaoEmprestimo.setManaged(false);
                 if (usuarioRecebido != null) {
                     usuarioIdentificado = usuarioRecebido;
-                    rotuloUsuario.setText("Usuário: " + usuarioRecebido.getNome());
+                    rotuloUsuario.setText(DadosUsuario.formatar(usuarioRecebido));
                     usuarioRecebido = null;
                 } else if (documentoRecebido != null && !documentoRecebido.isBlank()) {
                     documentoRecebido = null;
@@ -315,9 +310,9 @@ public class ReservaController {
 
             usuarioIdentificado = tarefa.getValue();
 
+            // CU 9 passo 05: exibe os dados do Usuário encontrado
             rotuloUsuario.setText(
-                    "Usuário: "
-                            + usuarioIdentificado.getNome()
+                    DadosUsuario.formatar(usuarioIdentificado)
             );
 
             atualizarBotoes();

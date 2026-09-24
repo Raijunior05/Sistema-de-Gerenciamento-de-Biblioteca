@@ -27,7 +27,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/** Casos de Uso 3, 5, 6 e 9. */
+/** Casos de Uso 3, 4, 5 e 9. */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("UsuarioService - CU 3 a 6 e CU 9")
 class UsuarioServiceTest {
@@ -89,8 +89,23 @@ class UsuarioServiceTest {
         void deveExigirSenhaParaAdministrador() {
             Usuario u = usuarioValido();
             u.setPerfil(Perfil.ADMINISTRADOR);
+            u.setLogin("mariana");
 
             assertThrows(RegraNegocioException.class, () -> service.cadastrar(u, null));
+            verify(usuarioDAO, never()).inserir(any());
+        }
+
+        @Test
+        @DisplayName("fluxo 4.1: perfil Administrador sem nome de usuario e recusado")
+        void deveExigirLoginParaAdministrador() {
+            Usuario u = usuarioValido();
+            u.setPerfil(Perfil.ADMINISTRADOR);
+            u.setLogin("   ");
+
+            RegraNegocioException erro = assertThrows(RegraNegocioException.class,
+                    () -> service.cadastrar(u, "senhaForte123".toCharArray()));
+
+            assertEquals("Informe o nome de usuário do Administrador.", erro.getMessage());
             verify(usuarioDAO, never()).inserir(any());
         }
 
@@ -124,6 +139,96 @@ class UsuarioServiceTest {
             u.setNome("  ");
 
             assertThrows(RegraNegocioException.class, () -> service.cadastrar(u, null));
+        }
+    }
+
+    @Nested
+    @DisplayName("CU 4 - Editar Usuario")
+    class Editar {
+
+        private Usuario administradorCadastrado(long id) {
+            Usuario u = usuarioValido();
+            u.setId(id);
+            u.setPerfil(Perfil.ADMINISTRADOR);
+            u.setLogin("mariana");
+            u.setSenhaHash("$2a$12$hashexistentehashexistentehashexistentehashexistente12");
+            return u;
+        }
+
+        private Usuario rebaixado(long id) {
+            Usuario u = usuarioValido();
+            u.setId(id);
+            u.setPerfil(Perfil.USUARIO);
+            return u;
+        }
+
+        @Test
+        @DisplayName("fluxo principal: atualiza e preserva a senha atual do Administrador")
+        void deveAtualizarPreservandoSenha() {
+            Usuario atual = administradorCadastrado(5L);
+            when(usuarioDAO.buscarPorId(5L)).thenReturn(Optional.of(atual));
+            Usuario editado = administradorCadastrado(5L);
+            editado.setSenhaHash(null);
+            editado.setNome("Mariana C. Silva");
+
+            service.editar(editado, null, ID_ADMIN_LOGADO);
+
+            assertEquals(atual.getSenhaHash(), editado.getSenhaHash());
+            verify(usuarioDAO).atualizar(editado);
+        }
+
+        @Test
+        @DisplayName("fluxo 4.1: nao retira o perfil do unico Administrador")
+        void deveBloquearRebaixarUltimoAdministrador() {
+            when(usuarioDAO.buscarPorId(5L)).thenReturn(Optional.of(administradorCadastrado(5L)));
+            when(usuarioDAO.contarAdministradores()).thenReturn(1L);
+
+            assertThrows(RegraNegocioException.class,
+                    () -> service.editar(rebaixado(5L), null, ID_ADMIN_LOGADO));
+
+            verify(usuarioDAO, never()).atualizar(any());
+        }
+
+        @Test
+        @DisplayName("fluxo 4.1: nao retira o perfil do proprio Administrador logado")
+        void deveBloquearRebaixarAdministradorLogado() {
+            when(usuarioDAO.buscarPorId(ID_ADMIN_LOGADO))
+                    .thenReturn(Optional.of(administradorCadastrado(ID_ADMIN_LOGADO)));
+
+            assertThrows(RegraNegocioException.class,
+                    () -> service.editar(rebaixado(ID_ADMIN_LOGADO), null, ID_ADMIN_LOGADO));
+
+            verify(usuarioDAO, never()).atualizar(any());
+        }
+
+        @Test
+        @DisplayName("rebaixa outro Administrador quando ha mais de um e remove as credenciais")
+        void deveRebaixarQuandoHaOutroAdministrador() {
+            when(usuarioDAO.buscarPorId(5L)).thenReturn(Optional.of(administradorCadastrado(5L)));
+            when(usuarioDAO.contarAdministradores()).thenReturn(2L);
+            Usuario editado = rebaixado(5L);
+            editado.setLogin("mariana");
+
+            service.editar(editado, null, ID_ADMIN_LOGADO);
+
+            assertNull(editado.getLogin());
+            assertNull(editado.getSenhaHash());
+            verify(usuarioDAO).atualizar(editado);
+        }
+
+        @Test
+        @DisplayName("fluxo 4.1: promover a Administrador exige senha")
+        void deveExigirSenhaAoPromover() {
+            when(usuarioDAO.buscarPorId(1L)).thenReturn(Optional.of(rebaixado(1L)));
+            Usuario promovido = usuarioValido();
+            promovido.setId(1L);
+            promovido.setPerfil(Perfil.ADMINISTRADOR);
+            promovido.setLogin("mariana");
+
+            assertThrows(RegraNegocioException.class,
+                    () -> service.editar(promovido, null, ID_ADMIN_LOGADO));
+
+            verify(usuarioDAO, never()).atualizar(any());
         }
     }
 
