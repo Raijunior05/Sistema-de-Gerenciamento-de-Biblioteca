@@ -621,3 +621,114 @@
 .consulta-usuario .tabela-consulta .corner {
     -fx-background-color: transparent;
 }
+
+/* =========================================================
+   TABELA - EDITAR / CONSULTAR USUÁRIO
+   ========================================================= */
+
+.editar-usuario .tabela-consulta,
+.consulta-usuario .tabela-consulta {
+    -fx-background-color: transparent;
+    -fx-border-color: rgba(197,160,89,0.35);
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+}
+
+.editar-usuario .tabela-consulta .column-header-background,
+.consulta-usuario .tabela-consulta .column-header-background {
+    -fx-background-color: rgba(45,55,72,0.95);
+}
+
+.editar-usuario .tabela-consulta .column-header,
+.editar-usuario .tabela-consulta .filler,
+.consulta-usuario .tabela-consulta .column-header,
+.consulta-usuario .tabela-consulta .filler {
+    -fx-background-color: rgba(45,55,72,0.95);
+    -fx-border-color: transparent rgba(197,160,89,0.25) rgba(197,160,89,0.25) transparent;
+}
+
+.editar-usuario .tabela-consulta .column-header .label,
+.consulta-usuario .tabela-consulta .column-header .label {
+    -fx-text-fill: -fx-gold;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 6px 4px;
+}
+
+.editar-usuario .tabela-consulta .table-row-cell,
+.consulta-usuario .tabela-consulta .table-row-cell {
+    -fx-background-color: rgba(45,55,72,0.88);
+    -fx-border-color: transparent transparent rgba(240,244,248,0.08) transparent;
+    -fx-cell-size: 42px;
+}
+
+.editar-usuario .tabela-consulta .table-row-cell:odd,
+.consulta-usuario .tabela-consulta .table-row-cell:odd {
+    -fx-background-color: rgba(20,37,77,0.88);
+}
+
+.editar-usuario .tabela-consulta .table-row-cell:selected,
+.consulta-usuario .tabela-consulta .table-row-cell:selected {
+    -fx-background-color: rgba(74,85,104,0.95);
+}
+
+.editar-usuario .tabela-consulta .table-cell,
+.consulta-usuario .tabela-consulta .table-cell {
+    -fx-text-fill: -fx-claro;
+    -fx-font-size: 12px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 6px 10px;
+    -fx-border-color: transparent;
+}
+
+/* botão da coluna ações */
+.editar-usuario .botao-acao-consulta,
+.consulta-usuario .botao-acao-consulta {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-border-color: transparent;
+    -fx-text-fill: -fx-gold;
+    -fx-font-size: 15px;
+    -fx-padding: 0;
+    -fx-min-width: 25px;
+    -fx-pref-width: 25px;
+    -fx-max-width: 25px;
+    -fx-min-height: 25px;
+    -fx-pref-height: 25px;
+    -fx-max-height: 25px;
+    -fx-cursor: hand;
+}
+
+.editar-usuario .botao-acao-consulta:hover,
+.consulta-usuario .botao-acao-consulta:hover {
+    -fx-background-color: rgba(197,160,89,0.15);
+    -fx-background-radius: 50%;
+}
+
+.editar-usuario .botao-acao-consulta:focused,
+.consulta-usuario .botao-acao-consulta:focused {
+    -fx-border-color: transparent;
+}
+
+/* some com barra horizontal */
+.editar-usuario .tabela-consulta .scroll-bar:horizontal,
+.consulta-usuario .tabela-consulta .scroll-bar:horizontal {
+    -fx-pref-height: 0;
+    -fx-max-height: 0;
+    -fx-opacity: 0;
+}
+
+.editar-usuario .tabela-consulta .scroll-bar:vertical,
+.consulta-usuario .tabela-consulta .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 8px;
+}
+
+.editar-usuario .tabela-consulta .scroll-bar:vertical .thumb,
+.consulta-usuario .tabela-consulta .scroll-bar:vertical .thumb {
+    -fx-background-color: rgba(197,160,89,0.35);
+    -fx-background-radius: 10px;
+}
