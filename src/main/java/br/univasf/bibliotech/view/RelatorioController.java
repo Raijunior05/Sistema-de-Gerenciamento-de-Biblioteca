@@ -9,6 +9,7 @@ import br.univasf.bibliotech.model.StatusReserva;
 import br.univasf.bibliotech.model.Usuario;
 import br.univasf.bibliotech.service.RelatorioService;
 import br.univasf.bibliotech.util.Datas;
+import br.univasf.bibliotech.util.ExportadorCsv;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -21,12 +22,19 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
@@ -37,6 +45,11 @@ public class RelatorioController {
     @FXML private VBox areaGerar;
     @FXML private VBox areaEmprestimos;
     @FXML private VBox areaReservas;
+
+    // Estado do ultimo relatorio gerado — usado pela exportacao CSV
+    private RelatorioService.Tipo ultimoTipo;
+    private List<Emprestimo> ultimasLinhasEmprestimos;
+    private List<RelatorioService.SituacaoItem> ultimasLinhasItens;
 
     private static final String HOJE = "Hoje (diário)";
     private static final String SEMANA = "Últimos 7 dias (semanal)";
@@ -128,8 +141,17 @@ public class RelatorioController {
         gerar.getStyleClass().add("botao-primario");
         gerar.setDisable(true);
 
+        // Botão de exportação — só aparece após relatório gerado com sucesso
+        Button exportarCsv = new Button("Exportar CSV");
+        exportarCsv.getStyleClass().add("botao-menu");
+        mostrar(exportarCsv, false);
+
+        // Os dois botões ficam lado a lado num HBox para não quebrarem no FlowPane
+        HBox botoesGerar = new HBox(8, gerar, exportarCsv);
+        botoesGerar.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+
         FlowPane filtros = new FlowPane(12, 12, rotulo("Tipo de relatório", tipo),
-                filtroUsuario, filtroTermo, filtroPeriodo, filtroInicio, filtroFim, gerar);
+                filtroUsuario, filtroTermo, filtroPeriodo, filtroInicio, filtroFim, botoesGerar);
 
         Label cabecalho = new Label("Escolha o tipo de relatório para exibir os filtros.");
         cabecalho.getStyleClass().add("rotulo-campo");
@@ -159,6 +181,11 @@ public class RelatorioController {
                     ? "Escolha o tipo de relatório para exibir os filtros."
                     : "Preencha os filtros e clique em \"Gerar relatório\".");
             resumo.setText("");
+            // Ao trocar o tipo, o relatório anterior deixa de ser válido
+            mostrar(exportarCsv, false);
+            ultimoTipo = null;
+            ultimasLinhasEmprestimos = null;
+            ultimasLinhasItens = null;
             mostrar(tabelaEmprestimos, t != null && !itens);
             mostrar(tabelaItens, itens);
             tabelaEmprestimos.getColumns().clear();
@@ -181,6 +208,7 @@ public class RelatorioController {
                 return;
             }
 
+            mostrar(exportarCsv, false);
             filtros.setDisable(true);
             resumo.setText("Gerando relatório…");
             Task<Object> tarefa = new Task<>() {
@@ -202,9 +230,12 @@ public class RelatorioController {
                 filtros.setDisable(false);
                 exibirRelatorio(t, tarefa.getValue(), de, ate, cabecalho, resumo,
                         tabelaEmprestimos, tabelaItens);
+                // Guarda estado para exportação e exibe o botão
+                mostrar(exportarCsv, true);
             });
             tarefa.setOnFailed(e -> {
                 filtros.setDisable(false);
+                mostrar(exportarCsv, false);
                 Throwable causa = tarefa.getException();
                 if (causa instanceof RegraNegocioException) {
                     resumo.setText(causa.getMessage());
@@ -221,7 +252,121 @@ public class RelatorioController {
         identificacao.setOnAction(e -> gerarRelatorio.run());
         termo.setOnAction(e -> gerarRelatorio.run());
 
+        // Ação do botão Exportar CSV
+        exportarCsv.setOnAction(e -> exportarCsvAtual(exportarCsv));
+
         areaGerar.getChildren().addAll(filtros, cabecalho, resumo, tabelaEmprestimos, tabelaItens);
+    }
+
+    /**
+     * Abre FileChooser e grava o ultimo relatorio gerado em CSV em thread de fundo.
+     * Trata cancelamento (usuario fecha o dialogo) e falha de I/O.
+     *
+     * @param botao botao que disparou a acao (usado para obter o Stage)
+     */
+    @SuppressWarnings("unchecked")
+    private void exportarCsvAtual(Button botao) {
+        if (ultimoTipo == null) {
+            return;
+        }
+
+        String nomeArquivo = "relatorio_"
+                + ultimoTipo.name().toLowerCase()
+                + "_" + Datas.formatar(LocalDate.now()).replace("/", "-")
+                + ".csv";
+
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Salvar relatório CSV");
+        chooser.setInitialFileName(nomeArquivo);
+        chooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Arquivo CSV (*.csv)", "*.csv"));
+
+        Stage stage = (Stage) botao.getScene().getWindow();
+        File destino = chooser.showSaveDialog(stage);
+
+        // Usuario cancelou o dialogo — nao faz nada
+        if (destino == null) {
+            return;
+        }
+
+        // Monta cabeçalho e linhas de acordo com o tipo do ultimo relatorio
+        final String[] cabecalho;
+        final List<String[]> linhas = new ArrayList<>();
+        boolean itens = ultimoTipo == RelatorioService.Tipo.ITENS_RESERVADOS_E_DISPONIVEIS;
+
+        if (itens) {
+            cabecalho = new String[]{"Tombo", "Título", "Autor",
+                    "Disponíveis / Total", "Aguardando na fila", "Separados p/ retirada"};
+            for (RelatorioService.SituacaoItem s : ultimasLinhasItens) {
+                linhas.add(new String[]{
+                        s.item().getTombo(),
+                        s.item().getTitulo(),
+                        s.item().getAutor(),
+                        s.item().getQuantidadeDisponivel() + " / " + s.item().getQuantidadeTotal(),
+                        String.valueOf(s.reservasAguardando()),
+                        String.valueOf(s.reservasParaRetirada())
+                });
+            }
+        } else {
+            boolean comUsuario = ultimoTipo != RelatorioService.Tipo.HISTORICO_POR_USUARIO;
+            boolean comDevolucao = ultimoTipo != RelatorioService.Tipo.ITENS_EMPRESTADOS;
+            LocalDate hoje = LocalDate.now();
+
+            List<String> cols = new ArrayList<>();
+            if (comUsuario) {
+                cols.add("Usuário");
+            }
+            cols.add("Código");
+            cols.add("Item");
+            cols.add("Retirada");
+            cols.add("Prazo");
+            if (comDevolucao) {
+                cols.add("Devolução");
+                cols.add("Dias de atraso");
+            }
+            cols.add("Status");
+            cabecalho = cols.toArray(new String[0]);
+
+            for (Emprestimo emp : ultimasLinhasEmprestimos) {
+                List<String> vals = new ArrayList<>();
+                if (comUsuario) {
+                    vals.add(emp.getUsuario().getNome());
+                }
+                vals.add(emp.getCodigo());
+                vals.add(emp.getItem().getTitulo());
+                vals.add(Datas.formatar(emp.getDataEmprestimo()));
+                vals.add(Datas.formatar(emp.getDataPrevista()));
+                if (comDevolucao) {
+                    vals.add(Datas.formatar(emp.getDataDevolucao()));
+                    vals.add(String.valueOf(emp.calcularDiasAtraso(hoje)));
+                }
+                vals.add(emp.getStatus().getRotulo());
+                linhas.add(vals.toArray(new String[0]));
+            }
+        }
+
+        // Grava em thread de fundo para não bloquear a UI
+        Path caminhoDestino = destino.toPath();
+        botao.setDisable(true);
+        Task<Void> tarefa = new Task<>() {
+            @Override
+            protected Void call() throws IOException {
+                ExportadorCsv.gravar(caminhoDestino, cabecalho, linhas);
+                return null;
+            }
+        };
+        tarefa.setOnSucceeded(ev -> {
+            botao.setDisable(false);
+            Alertas.sucesso("Exportação concluída",
+                    "Arquivo salvo em:\n" + caminhoDestino.toAbsolutePath());
+        });
+        tarefa.setOnFailed(ev -> {
+            botao.setDisable(false);
+            Alertas.erro("Não foi possível salvar o arquivo CSV.", tarefa.getException());
+        });
+        Thread thread = new Thread(tarefa, "exportar-csv");
+        thread.setDaemon(true);
+        thread.start();
     }
 
     /** Resultado do histórico: o usuário identificado e a lista gerada em segundo plano. */
@@ -297,6 +442,18 @@ public class RelatorioController {
         resumo.setText(registros == 0
                 ? "Não existem registros para os filtros informados."
                 : "Resumo: " + totais + ".");
+
+        // Salva estado para exportacao CSV posterior
+        ultimoTipo = tipo;
+        if (itens) {
+            ultimasLinhasItens = (List<RelatorioService.SituacaoItem>) resultado;
+            ultimasLinhasEmprestimos = null;
+        } else {
+            ultimasLinhasEmprestimos = tipo == RelatorioService.Tipo.HISTORICO_POR_USUARIO
+                    ? ((Historico) resultado).emprestimos()
+                    : (List<Emprestimo>) resultado;
+            ultimasLinhasItens = null;
+        }
     }
 
     private static void mostrar(javafx.scene.Node no, boolean visivel) {
