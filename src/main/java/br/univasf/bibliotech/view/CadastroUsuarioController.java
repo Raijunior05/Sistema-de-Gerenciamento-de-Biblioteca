@@ -94,6 +94,10 @@ public class CadastroUsuarioController {
 
         if (usuario.getPerfil() == Perfil.ADMINISTRADOR) {
             usuario.setLogin(campoLogin.getText() != null ? campoLogin.getText().trim() : "");
+            if (usuario.getLogin().isBlank()) {
+                mensagemErro.setText("Informe o nome de usuário do Administrador.");
+                return;
+            }
 
             senha = campoSenha.getText() != null ? campoSenha.getText().toCharArray() : new char[0];
             char[] confirmaSenha = campoConfirmaSenha.getText() != null
@@ -129,7 +133,7 @@ public class CadastroUsuarioController {
             if (senhaFinal != null) Arrays.fill(senhaFinal, ' ');
             botaoSalvar.setDisable(false);
             Alertas.sucesso("Usuário Cadastrado", "O cadastro do usuário foi realizado com sucesso!");
-            Navegador.irPara(Navegador.Tela.VISAO_GERAL);
+            Navegador.irPara(Navegador.Tela.USUARIOS);
         });
 
         tarefa.setOnFailed(e -> {
@@ -149,8 +153,9 @@ public class CadastroUsuarioController {
         thread.start();
     }
 
+    /** CU 3 estende o CU 2: cancelar volta para Administrar Usuarios. */
     @FXML
     private void onCancelar() {
-        Navegador.irPara(Navegador.Tela.VISAO_GERAL);
+        Navegador.irPara(Navegador.Tela.USUARIOS);
     }
 }

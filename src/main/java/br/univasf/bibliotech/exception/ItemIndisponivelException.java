@@ -8,8 +8,12 @@ public class ItemIndisponivelException extends RegraNegocioException {
     private final transient Item item;
 
     public ItemIndisponivelException(Item item) {
-        super("O item \"" + item.getTitulo() + "\" nao possui exemplares disponiveis. "
+        this(item, "O item \"" + item.getTitulo() + "\" não possui exemplares disponíveis. "
                 + "Deseja registrar uma reserva?");
+    }
+
+    public ItemIndisponivelException(Item item, String mensagem) {
+        super(mensagem);
         this.item = item;
     }
 

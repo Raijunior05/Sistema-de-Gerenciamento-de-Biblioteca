@@ -10,7 +10,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 
 /**
@@ -20,8 +19,6 @@ public class CadastroItemController {
 
     @FXML private TextField campoTitulo;
     @FXML private TextField campoAutor;
-    @FXML private RadioButton radioIsbn;
-    @FXML private RadioButton radioOutro;
     @FXML private TextField campoIsbn;
     @FXML private TextField campoEditora;
     @FXML private TextField campoAno;
@@ -88,10 +85,18 @@ public class CadastroItemController {
             botaoSalvar.setDisable(false);
             Item cadastrado = tarefa.getValue();
 
-            // Exibe diálogo com o Tombo gerado (ex: ACV-00001)
-            Alertas.sucesso("Item Cadastrado",
-                    String.format("Item cadastrado com sucesso no acervo!\nNúmero de Tombo Gerado: %s",
-                            cadastrado.getTombo()));
+            // CU 7 passo 08: mensagem de sucesso com os dados do item cadastrado
+            Alertas.sucesso("Item cadastrado", "Item cadastrado com sucesso no acervo!\n\n"
+                    + "Nº de tombo: " + cadastrado.getTombo() + "\n"
+                    + "Título: " + cadastrado.getTitulo() + "\n"
+                    + "Autor: " + cadastrado.getAutor() + "\n"
+                    + "ISBN/identificador: " + informado(cadastrado.getIsbn()) + "\n"
+                    + "Editora: " + informado(cadastrado.getEditora()) + "\n"
+                    + "Ano: " + (cadastrado.getAnoPublicacao() == null
+                            ? "Não informado" : cadastrado.getAnoPublicacao()) + "\n"
+                    + "Categoria: " + informado(cadastrado.getCategoria()) + "\n"
+                    + "Tipo: " + cadastrado.getTipo() + "\n"
+                    + "Quantidade: " + cadastrado.getQuantidadeTotal());
 
             Navegador.irPara(Navegador.Tela.VISAO_GERAL);
         });
@@ -111,6 +116,10 @@ public class CadastroItemController {
         Thread thread = new Thread(tarefa, "cadastrar-item");
         thread.setDaemon(true);
         thread.start();
+    }
+
+    private static String informado(String valor) {
+        return valor == null || valor.isBlank() ? "Não informado" : valor;
     }
 
     @FXML

@@ -1,7 +1,10 @@
 package br.univasf.bibliotech.dao;
 
+import br.univasf.bibliotech.exception.DataAccessException;
+import br.univasf.bibliotech.model.Emprestimo;
 import br.univasf.bibliotech.model.Item;
 import br.univasf.bibliotech.model.Perfil;
+import br.univasf.bibliotech.model.StatusEmprestimo;
 import br.univasf.bibliotech.model.Usuario;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -16,10 +19,12 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import javax.sql.DataSource;
+import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -141,6 +146,74 @@ class DaoIntegracaoTest {
         // CU 12 passo 07
         itemDAO.incrementarDisponivel(item.getId());
         assertEquals(1, itemDAO.quantidadeDisponivel(item.getId()));
+    }
+
+    @Test
+    @DisplayName("CU 5 passo 04: exclusao preserva o historico concluido e V5 barra movimento ativo")
+    void deveExcluirUsuarioPreservandoHistorico() {
+        var emprestimoDAO = new EmprestimoDAOPostgres(dataSource);
+        Usuario comHistorico = usuarioComMatricula("Historico");
+        Usuario comAberto = usuarioComMatricula("Aberto");
+        Item item = itemComExemplares(2);
+
+        Emprestimo concluido = new Emprestimo(comHistorico, item, LocalDate.now().plusDays(5));
+        concluido.setDataEmprestimo(LocalDate.now());
+        emprestimoDAO.inserir(concluido);
+        concluido.setDataDevolucao(LocalDate.now());
+        concluido.setStatus(StatusEmprestimo.CONCLUIDO);
+        emprestimoDAO.atualizar(concluido);
+
+        Emprestimo aberto = new Emprestimo(comAberto, item, LocalDate.now().plusDays(5));
+        aberto.setDataEmprestimo(LocalDate.now());
+        emprestimoDAO.inserir(aberto);
+
+        usuarioDAO.excluir(comHistorico.getId());
+
+        assertTrue(usuarioDAO.buscarPorId(comHistorico.getId()).isEmpty());
+        Emprestimo historico = emprestimoDAO.buscarPorId(concluido.getId()).orElseThrow();
+        assertNull(historico.getUsuario().getId());
+        assertEquals("(usuário excluído)", historico.getUsuario().getNome());
+
+        assertThrows(DataAccessException.class, () -> usuarioDAO.excluir(comAberto.getId()));
+        assertTrue(usuarioDAO.buscarPorId(comAberto.getId()).isPresent());
+    }
+
+    @Test
+    @DisplayName("CU 10 passos 08 e 09: falha na mesma transacao desfaz o registro")
+    void deveDesfazerRegistroQuandoTransacaoFalha() {
+        var transacao = new TransacaoJdbc(dataSource);
+        var emprestimoDAO = new EmprestimoDAOPostgres(transacao);
+        Usuario usuario = usuarioComMatricula("Transacao");
+        Item item = itemComExemplares(1);
+        Emprestimo emprestimo = new Emprestimo(usuario, item, LocalDate.now().plusDays(5));
+        emprestimo.setDataEmprestimo(LocalDate.now());
+
+        assertThrows(IllegalStateException.class, () -> transacao.executar(() -> {
+            emprestimoDAO.inserir(emprestimo);
+            throw new IllegalStateException("falha simulada no passo 09");
+        }));
+
+        assertTrue(emprestimoDAO.buscarPorId(emprestimo.getId()).isEmpty());
+    }
+
+    private Usuario usuarioComMatricula(String nome) {
+        Usuario u = new Usuario();
+        u.setNome(nome);
+        u.setEmail(nome.toLowerCase() + "." + System.nanoTime() + "@email.com");
+        u.setMatricula("MAT" + System.nanoTime());
+        u.setPerfil(Perfil.USUARIO);
+        usuarioDAO.inserir(u);
+        return u;
+    }
+
+    private Item itemComExemplares(int quantidade) {
+        Item item = new Item();
+        item.setTitulo("Item " + System.nanoTime());
+        item.setAutor("Autor");
+        item.setQuantidadeTotal(quantidade);
+        item.setQuantidadeDisponivel(quantidade);
+        itemDAO.inserir(item);
+        return item;
     }
 
     @Test

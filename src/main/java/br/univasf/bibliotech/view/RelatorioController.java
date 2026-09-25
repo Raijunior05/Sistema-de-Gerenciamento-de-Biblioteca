@@ -1,10 +1,13 @@
 package br.univasf.bibliotech.view;
 
 import br.univasf.bibliotech.App;
+import br.univasf.bibliotech.exception.RegraNegocioException;
 import br.univasf.bibliotech.model.Emprestimo;
 import br.univasf.bibliotech.model.Reserva;
 import br.univasf.bibliotech.model.StatusEmprestimo;
 import br.univasf.bibliotech.model.StatusReserva;
+import br.univasf.bibliotech.model.Usuario;
+import br.univasf.bibliotech.service.RelatorioService;
 import br.univasf.bibliotech.util.Datas;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.concurrent.Task;
@@ -19,7 +22,9 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.util.StringConverter;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -29,13 +34,274 @@ import java.util.function.Function;
 /** CU 13 - area de relatorios, com consultas de emprestimos e reservas. */
 public class RelatorioController {
 
+    @FXML private VBox areaGerar;
     @FXML private VBox areaEmprestimos;
     @FXML private VBox areaReservas;
 
+    private static final String HOJE = "Hoje (diário)";
+    private static final String SEMANA = "Últimos 7 dias (semanal)";
+    private static final String MES = "Mês atual (mensal)";
+    private static final String TUDO = "Todo o período";
+    private static final String PERSONALIZADO = "Personalizado";
+
     @FXML
     private void initialize() {
+        montarGerarRelatorio();
         montarEmprestimos();
         montarReservas();
+    }
+
+    private static String rotulo(RelatorioService.Tipo tipo) {
+        return switch (tipo) {
+            case ITENS_EMPRESTADOS -> "Itens emprestados";
+            case ITENS_RESERVADOS_E_DISPONIVEIS -> "Itens reservados e disponíveis";
+            case ATRASOS -> "Atrasos";
+            case HISTORICO_POR_USUARIO -> "Histórico de empréstimos por usuário";
+        };
+    }
+
+    /** CU 13 passos 01 a 04 e fluxo alternativo 4.1. */
+    private void montarGerarRelatorio() {
+        // Passo 01: tipo de relatório
+        ComboBox<RelatorioService.Tipo> tipo = new ComboBox<>();
+        tipo.getItems().setAll(RelatorioService.Tipo.values());
+        tipo.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(RelatorioService.Tipo t) {
+                return t == null ? "" : rotulo(t);
+            }
+
+            @Override
+            public RelatorioService.Tipo fromString(String texto) {
+                return null;
+            }
+        });
+        tipo.setPromptText("Escolha o tipo de relatório");
+        tipo.setPrefWidth(340);
+
+        // Passo 02: filtros disponíveis para o tipo escolhido
+        ComboBox<String> periodo = new ComboBox<>();
+        periodo.getItems().setAll(HOJE, SEMANA, MES, TUDO, PERSONALIZADO);
+        DatePicker inicio = new DatePicker();
+        DatePicker fim = new DatePicker();
+        inicio.setPrefWidth(145);
+        fim.setPrefWidth(145);
+        boolean[] aplicandoAtalho = {false};
+        periodo.setOnAction(e -> {
+            LocalDate hoje = LocalDate.now();
+            String escolha = periodo.getValue();
+            aplicandoAtalho[0] = true;
+            if (HOJE.equals(escolha)) {
+                inicio.setValue(hoje);
+                fim.setValue(hoje);
+            } else if (SEMANA.equals(escolha)) {
+                inicio.setValue(hoje.minusDays(6));
+                fim.setValue(hoje);
+            } else if (MES.equals(escolha)) {
+                inicio.setValue(hoje.withDayOfMonth(1));
+                fim.setValue(hoje);
+            } else if (TUDO.equals(escolha)) {
+                inicio.setValue(null);
+                fim.setValue(null);
+            }
+            aplicandoAtalho[0] = false;
+        });
+        periodo.setValue(MES);
+        periodo.getOnAction().handle(null);
+        inicio.setOnAction(e -> {
+            if (!aplicandoAtalho[0]) {
+                periodo.setValue(PERSONALIZADO);
+            }
+        });
+        fim.setOnAction(inicio.getOnAction());
+
+        TextField identificacao = campoBusca("CPF ou matrícula do usuário");
+        TextField termo = campoBusca("Título, autor, categoria, ISBN ou tombo");
+
+        VBox filtroPeriodo = rotulo("Período de retirada", periodo);
+        VBox filtroInicio = rotulo("De", inicio);
+        VBox filtroFim = rotulo("Até", fim);
+        VBox filtroUsuario = rotulo("Usuário", identificacao);
+        VBox filtroTermo = rotulo("Busca no acervo", termo);
+
+        Button gerar = new Button("Gerar relatório");
+        gerar.getStyleClass().add("botao-primario");
+        gerar.setDisable(true);
+
+        FlowPane filtros = new FlowPane(12, 12, rotulo("Tipo de relatório", tipo),
+                filtroUsuario, filtroTermo, filtroPeriodo, filtroInicio, filtroFim, gerar);
+
+        Label cabecalho = new Label("Escolha o tipo de relatório para exibir os filtros.");
+        cabecalho.getStyleClass().add("rotulo-campo");
+        cabecalho.setWrapText(true);
+        cabecalho.setMinHeight(Region.USE_PREF_SIZE);
+        Label resumo = new Label();
+        resumo.getStyleClass().add("rotulo-secao");
+        resumo.setWrapText(true);
+        resumo.setMinHeight(Region.USE_PREF_SIZE);
+
+        // Colunas mudam a cada tipo; a politica restrita espreme colunas recriadas.
+        TableView<Emprestimo> tabelaEmprestimos = tabela();
+        tabelaEmprestimos.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+        TableView<RelatorioService.SituacaoItem> tabelaItens = tabela();
+        tabelaItens.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+
+        Runnable exibirFiltros = () -> {
+            RelatorioService.Tipo t = tipo.getValue();
+            boolean itens = t == RelatorioService.Tipo.ITENS_RESERVADOS_E_DISPONIVEIS;
+            mostrar(filtroUsuario, t == RelatorioService.Tipo.HISTORICO_POR_USUARIO);
+            mostrar(filtroTermo, itens);
+            mostrar(filtroPeriodo, t != null && !itens);
+            mostrar(filtroInicio, t != null && !itens);
+            mostrar(filtroFim, t != null && !itens);
+            gerar.setDisable(t == null);
+            cabecalho.setText(t == null
+                    ? "Escolha o tipo de relatório para exibir os filtros."
+                    : "Preencha os filtros e clique em \"Gerar relatório\".");
+            resumo.setText("");
+            mostrar(tabelaEmprestimos, t != null && !itens);
+            mostrar(tabelaItens, itens);
+            tabelaEmprestimos.getColumns().clear();
+            tabelaEmprestimos.getItems().clear();
+            tabelaItens.getColumns().clear();
+            tabelaItens.getItems().clear();
+        };
+        tipo.setOnAction(e -> exibirFiltros.run());
+        exibirFiltros.run();
+
+        // Passos 03 e 04: filtros lidos na thread JavaFX; consulta em segundo plano
+        Runnable gerarRelatorio = () -> {
+            RelatorioService.Tipo t = tipo.getValue();
+            LocalDate de = inicio.getValue();
+            LocalDate ate = fim.getValue();
+            String documento = identificacao.getText().trim();
+            String busca = termo.getText().trim();
+            if (t == RelatorioService.Tipo.HISTORICO_POR_USUARIO && documento.isBlank()) {
+                resumo.setText("Informe o CPF ou a matrícula do usuário.");
+                return;
+            }
+
+            filtros.setDisable(true);
+            resumo.setText("Gerando relatório…");
+            Task<Object> tarefa = new Task<>() {
+                @Override
+                protected Object call() {
+                    var relatorios = App.servicos().relatorios();
+                    return switch (t) {
+                        case ITENS_EMPRESTADOS -> relatorios.itensEmprestados(de, ate);
+                        case ATRASOS -> relatorios.atrasos(de, ate);
+                        case HISTORICO_POR_USUARIO -> new Historico(
+                                App.servicos().usuarios().identificar(documento),
+                                de, ate);
+                        case ITENS_RESERVADOS_E_DISPONIVEIS ->
+                                relatorios.itensReservadosEDisponiveis(busca);
+                    };
+                }
+            };
+            tarefa.setOnSucceeded(e -> {
+                filtros.setDisable(false);
+                exibirRelatorio(t, tarefa.getValue(), de, ate, cabecalho, resumo,
+                        tabelaEmprestimos, tabelaItens);
+            });
+            tarefa.setOnFailed(e -> {
+                filtros.setDisable(false);
+                Throwable causa = tarefa.getException();
+                if (causa instanceof RegraNegocioException) {
+                    resumo.setText(causa.getMessage());
+                } else {
+                    resumo.setText("Falha ao gerar o relatório. Tente novamente.");
+                    Alertas.erro("Não foi possível gerar o relatório.", causa);
+                }
+            });
+            Thread thread = new Thread(tarefa, "gerar-relatorio");
+            thread.setDaemon(true);
+            thread.start();
+        };
+        gerar.setOnAction(e -> gerarRelatorio.run());
+        identificacao.setOnAction(e -> gerarRelatorio.run());
+        termo.setOnAction(e -> gerarRelatorio.run());
+
+        areaGerar.getChildren().addAll(filtros, cabecalho, resumo, tabelaEmprestimos, tabelaItens);
+    }
+
+    /** Resultado do histórico: o usuário identificado e a lista gerada em segundo plano. */
+    private record Historico(Usuario usuario, List<Emprestimo> emprestimos) {
+        Historico(Usuario usuario, LocalDate de, LocalDate ate) {
+            this(usuario, App.servicos().relatorios().historicoPorUsuario(usuario, de, ate));
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void exibirRelatorio(RelatorioService.Tipo tipo, Object resultado,
+                                 LocalDate de, LocalDate ate, Label cabecalho, Label resumo,
+                                 TableView<Emprestimo> tabelaEmprestimos,
+                                 TableView<RelatorioService.SituacaoItem> tabelaItens) {
+        LocalDate hoje = LocalDate.now();
+        String periodo = de == null && ate == null ? "todo o período"
+                : (de == null ? "início" : Datas.formatar(de)) + " a "
+                        + (ate == null ? "hoje" : Datas.formatar(ate));
+        String titulo = "Relatório: " + rotulo(tipo);
+        boolean itens = tipo == RelatorioService.Tipo.ITENS_RESERVADOS_E_DISPONIVEIS;
+        mostrar(tabelaItens, itens);
+        mostrar(tabelaEmprestimos, !itens);
+        tabelaEmprestimos.getColumns().clear();
+        tabelaItens.getColumns().clear();
+
+        int registros;
+        String totais;
+        if (itens) {
+            var linhas = (List<RelatorioService.SituacaoItem>) resultado;
+            coluna(tabelaItens, "Tombo", s -> s.item().getTombo());
+            coluna(tabelaItens, "Título", s -> s.item().getTitulo());
+            coluna(tabelaItens, "Autor", s -> s.item().getAutor());
+            coluna(tabelaItens, "Disponíveis", s -> s.item().getQuantidadeDisponivel()
+                    + " / " + s.item().getQuantidadeTotal());
+            coluna(tabelaItens, "Aguardando na fila", s -> String.valueOf(s.reservasAguardando()));
+            coluna(tabelaItens, "Separados p/ retirada", s -> String.valueOf(s.reservasParaRetirada()));
+            tabelaItens.getItems().setAll(linhas);
+            registros = linhas.size();
+            totais = registros + " item(ns) · "
+                    + linhas.stream().mapToInt(s -> s.item().getQuantidadeDisponivel()).sum()
+                    + " exemplar(es) disponível(is) · "
+                    + linhas.stream().mapToInt(s -> s.reservasAguardando() + s.reservasParaRetirada()).sum()
+                    + " reserva(s) ativa(s)";
+        } else {
+            List<Emprestimo> lista;
+            if (tipo == RelatorioService.Tipo.HISTORICO_POR_USUARIO) {
+                Historico h = (Historico) resultado;
+                lista = h.emprestimos();
+                titulo += " — " + h.usuario().getNome();
+            } else {
+                lista = (List<Emprestimo>) resultado;
+                coluna(tabelaEmprestimos, "Usuário", e -> e.getUsuario().getNome());
+            }
+            coluna(tabelaEmprestimos, "Código", Emprestimo::getCodigo);
+            coluna(tabelaEmprestimos, "Item", e -> e.getItem().getTitulo());
+            coluna(tabelaEmprestimos, "Retirada", e -> Datas.formatar(e.getDataEmprestimo()));
+            coluna(tabelaEmprestimos, "Prazo", e -> Datas.formatar(e.getDataPrevista()));
+            if (tipo != RelatorioService.Tipo.ITENS_EMPRESTADOS) {
+                coluna(tabelaEmprestimos, "Devolução", e -> Datas.formatar(e.getDataDevolucao()));
+                coluna(tabelaEmprestimos, "Dias de atraso",
+                        e -> String.valueOf(e.calcularDiasAtraso(hoje)));
+            }
+            coluna(tabelaEmprestimos, "Status", e -> e.getStatus().getRotulo());
+            tabelaEmprestimos.getItems().setAll(lista);
+            registros = lista.size();
+            long emAtraso = lista.stream().filter(e -> e.calcularDiasAtraso(hoje) > 0).count();
+            totais = registros + " empréstimo(s) · " + emAtraso + " com atraso";
+        }
+
+        cabecalho.setText(titulo + "\nPeríodo: " + (itens ? "situação atual" : periodo)
+                + " · Gerado em " + Datas.formatar(hoje));
+        // Fluxo 4.1: dados insuficientes para exibição
+        resumo.setText(registros == 0
+                ? "Não existem registros para os filtros informados."
+                : "Resumo: " + totais + ".");
+    }
+
+    private static void mostrar(javafx.scene.Node no, boolean visivel) {
+        no.setVisible(visivel);
+        no.setManaged(visivel);
     }
 
     private void montarEmprestimos() {

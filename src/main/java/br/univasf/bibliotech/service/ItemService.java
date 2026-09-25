@@ -18,12 +18,13 @@ public class ItemService {
     }
 
     /**
-     * CU 7 - Cadastrar Item.
+     * CU 7 - Cadastrar Item, passos 05 a 07.
      *
      * <p>O tombo (passo 07) e gerado pelo DAO, nao informado pelo
      * Administrador.</p>
      *
-     * @throws DadosDuplicadosException fluxo alternativo 5.1
+     * @throws RegraNegocioException    fluxo alternativo 5.1, dados invalidos
+     * @throws DadosDuplicadosException fluxo alternativo 5.1, item ja cadastrado
      */
     public void cadastrar(Item item) {
         validar(item, null);
@@ -66,6 +67,10 @@ public class ItemService {
     }
 
     private void validar(Item i, Long ignorarId) {
+        // ISBN e opcional; vazio vira nulo para nao colidir com o UNIQUE da coluna.
+        if (i.getIsbn() != null && i.getIsbn().isBlank()) {
+            i.setIsbn(null);
+        }
         if (i.getTitulo() == null || i.getTitulo().isBlank()) {
             throw new RegraNegocioException("Informe o titulo do item.");
         }

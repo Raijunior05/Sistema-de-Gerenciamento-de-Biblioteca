@@ -3,9 +3,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -33,16 +31,9 @@
         <Label text="Autor:" styleClass="rotulo-campo" layoutX="20" layoutY="110"/>
         <TextField fx:id="campoAutor" layoutX="18" layoutY="130" prefWidth="344"/>
 
-        <!-- Seleção ISBN / Identificador e Campo de Texto -->
+        <!-- ISBN ou identificador (opcional; único quando informado) -->
         <Label text="ISBN ou Identificador:" styleClass="rotulo-campo" layoutX="20" layoutY="172"/>
-        <fx:define>
-            <ToggleGroup fx:id="grupoTipoIdentificador"/>
-        </fx:define>
-        <RadioButton fx:id="radioIsbn" toggleGroup="$grupoTipoIdentificador" selected="true"
-                     layoutX="20" layoutY="198"/>
-        <RadioButton fx:id="radioOutro" toggleGroup="$grupoTipoIdentificador"
-                     layoutX="50" layoutY="198"/>
-        <TextField fx:id="campoIsbn" layoutX="82" layoutY="192" prefWidth="280"/>
+        <TextField fx:id="campoIsbn" layoutX="18" layoutY="192" prefWidth="344"/>
 
         <!-- Editora -->
         <Label text="Editora:" styleClass="rotulo-campo" layoutX="20" layoutY="234"/>
@@ -76,9 +67,9 @@
 
     <Region HBox.hgrow="ALWAYS"/>
 
-    <!-- Lado Direito (Marca SGB e Ilustração) -->
+    <!-- Lado Direito (Marca BiblioTech e Ilustração) -->
     <VBox alignment="TOP_CENTER" spacing="4" prefWidth="330" minWidth="330" maxHeight="500">
-        <Label text="S G B" styleClass="marca-sgb,login-marca"/>
+        <Label text="BiblioTech" styleClass="marca-sgb,login-marca"/>
         <Label text="Sistema de Gerenciamento de Bibliotecas" styleClass="marca-legenda"/>
         <Region prefHeight="45"/>
         <ImageView fitWidth="405" fitHeight="260" preserveRatio="true">

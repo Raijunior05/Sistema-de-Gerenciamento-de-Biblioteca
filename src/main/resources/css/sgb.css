@@ -467,7 +467,7 @@
 }
 .login .rotulo-campo { -fx-font-size: 15px; }
 .login .link-discreto { -fx-font-size: 9px; -fx-padding: 0px 8px; }
-.login-marca { -fx-font-size: 64px; -fx-effect: dropshadow(gaussian, rgba(240,244,248,0.5), 5, 0, 0, 0); }
+.login-marca { -fx-font-size: 54px; -fx-effect: dropshadow(gaussian, rgba(240,244,248,0.5), 5, 0, 0, 0); }
 .login .marca-legenda { -fx-font-size: 9px; }
 .tela-prototipo .botao-menu, .tela-prototipo .botao-primario {
     -fx-background-radius: 17px;
@@ -1109,4 +1109,33 @@
     -fx-font-size: 11px;
     -fx-alignment: CENTER_LEFT;
     -fx-border-color: transparent;
+}
+/* ---------- Identificacao e opcoes de formulario ---------- */
+.opcao-documento {
+    -fx-text-fill: -fx-gold;
+    -fx-font-size: 12px;
+}
+
+/* CU 9 passo 05: dados do Usuario identificado */
+.dados-usuario {
+    -fx-text-fill: -fx-claro;
+    -fx-font-size: 11px;
+}
+
+.dados-usuario-encontrado {
+    -fx-text-fill: -fx-verde-100;
+}
+
+.dados-usuario-ausente {
+    -fx-text-fill: -fx-verm-100;
+}
+
+/* CU 10 passo 03: resultado da verificacao de disponibilidade */
+.aviso-disponibilidade {
+    -fx-text-fill: -fx-gold-100;
+    -fx-font-size: 11px;
+}
+
+.campo-somente-leitura {
+    -fx-opacity: 0.75;
 }
